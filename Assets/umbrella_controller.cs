@@ -21,12 +21,15 @@ public class UmbrellaController : MonoBehaviour
     private PlayerController playerController;
     public Color umbrellaDownColor = Color.green; 
     public LayerMask hazardLayer; 
-    public float collisionForceMultiplier = 0.1f; 
-    public float debugForceMagnitude = 1f; 
+    public float collisionForceMultiplier = 0.5f; 
+    public float debugForceMagnitude = 10f; 
+    public float collisionCooldown = 0.1f; 
     private bool isUmbrellaFacingDown = false; 
+    private float lastCollisionTime = 0f; 
 
     void Start()
     {
+        // Close umbrella on start
         transform.localScale = closedSize;
         playerRb = player.GetComponent<Rigidbody2D>();
         originalGravityScale = playerRb.gravityScale; 
@@ -38,6 +41,7 @@ public class UmbrellaController : MonoBehaviour
 
     void Update()
     {
+        // Grab cursor
         Vector3 direction = Vector3.zero;
         Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mousePosition.z = 0;
@@ -56,14 +60,14 @@ public class UmbrellaController : MonoBehaviour
             wasM1 = true;
             umbrellaOpen = true;
 
-            // Umbrella float
+            // Umbrella air float
             if (angle > 315f || angle < 45f)
             {
                 playerRb.gravityScale = 0f;
                 playerSpriteRenderer.color = slowedColor;
                 isUmbrellaFacingDown = false;
             }
-            // Umbrella bounce
+            // Umbrella water float
             else if (angle > 135f && angle < 225f)
             {
                 playerSpriteRenderer.color = umbrellaDownColor;
@@ -93,15 +97,41 @@ public class UmbrellaController : MonoBehaviour
 
     void OnTriggerStay2D(Collider2D other)
     {
-        if (umbrellaOpen && isUmbrellaFacingDown && ((1 << other.gameObject.layer) & hazardLayer) != 0)
+        if (Time.time - lastCollisionTime >= collisionCooldown)
         {
-            Vector2 collisionDirection = player.position - transform.position;
-            collisionDirection.Normalize();
-            Vector2 force = collisionDirection * debugForceMagnitude; 
+            bool isHazard = ((1 << other.gameObject.layer) & hazardLayer) != 0;
+            bool isWater = other.CompareTag("Water");
 
-            playerRb.AddForce(force, ForceMode2D.Impulse);
+            if (umbrellaOpen && isHazard)
+            {
+                float waterMultiplier = 1f;
+                if (isWater && !isUmbrellaFacingDown)
+                {
+                    // Fall through water if umbrella not facing down
+                    return;
+                } 
+                // Altered logic so instead of "rebounding," the player "floats." This also adds "pseudo surface tension"
+                else if (isWater && isUmbrellaFacingDown) {
+                    waterMultiplier = 0.5f;
+                }
+                if (!isWater) {
+                    playerRb.velocity = Vector2.zero;
+                }
+                Vector2 collisionDirection = player.position - transform.position;
+                collisionDirection.Normalize();
+                Vector2 force = collisionDirection * debugForceMagnitude * collisionForceMultiplier * waterMultiplier;
+                playerRb.AddForce(force, ForceMode2D.Impulse);
 
-            Debug.DrawLine(transform.position, transform.position + (Vector3)force, Color.red, 2f);
+                // Apply opposite force to hazards
+                Rigidbody2D otherRb = other.GetComponent<Rigidbody2D>();
+                if (otherRb != null)
+                {
+                    Vector2 oppositeForce = -force;
+                    otherRb.AddForce(oppositeForce, ForceMode2D.Impulse);
+                }
+
+                lastCollisionTime = Time.time;
+            }
         }
     }
 
@@ -117,6 +147,5 @@ public class UmbrellaController : MonoBehaviour
     {
         playerRb.gravityScale = originalGravityScale;
         playerSpriteRenderer.color = originalColor;
-        Debug.Log("ResetGravityAndColor called. Color reset to original.");
     }
 }
