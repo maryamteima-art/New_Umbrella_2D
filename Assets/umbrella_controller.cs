@@ -10,10 +10,11 @@ public class UmbrellaController : MonoBehaviour
     public float slowFallGravityScale = 0.1f; 
     public Color slowedColor = Color.blue; 
     public float slowFallSpeed = 1f; 
+    public bool umbrellaOpen = false;
+    public float umbrellaAngle = 0;
     private Vector3 closedSize = new Vector3(0.5f, 1.5f, 1f); 
     private Vector3 openSize = new Vector3(2f, 0.5f, 1f); 
     private bool wasM1 = false;
-    private bool umbrellaOpen = false;
     private Rigidbody2D playerRb;
     private SpriteRenderer playerSpriteRenderer;
     private Color originalColor;
@@ -54,14 +55,17 @@ public class UmbrellaController : MonoBehaviour
         }
         transform.position = player.position + direction * displacement; 
         transform.rotation = Quaternion.Euler(0, 0, angle);
+
         if (Input.GetMouseButton(0)) 
         {
             transform.localScale = openSize;
             wasM1 = true;
             umbrellaOpen = true;
 
-            // Umbrella air float
-            if (angle > 315f || angle < 45f)
+            umbrellaAngle = angle;
+
+            // Umbrella air float (disregard floating when player or ubrella are in wind)
+            if ((angle > 315f || angle < 45f) && !transform.parent.GetComponent<PlayerController>().inWind)
             {
                 playerRb.gravityScale = 0f;
                 playerSpriteRenderer.color = slowedColor;
@@ -104,7 +108,7 @@ public class UmbrellaController : MonoBehaviour
 
             if (umbrellaOpen && isHazard)
             {
-                float waterMultiplier = 1f;
+                float forceMultiplier = 1f;
                 if (isWater && !isUmbrellaFacingDown)
                 {
                     // Fall through water if umbrella not facing down
@@ -112,14 +116,17 @@ public class UmbrellaController : MonoBehaviour
                 } 
                 // Altered logic so instead of "rebounding," the player "floats." This also adds "pseudo surface tension"
                 else if (isWater && isUmbrellaFacingDown) {
-                    waterMultiplier = 0.5f;
+                    forceMultiplier = 0.5f;
+                }
+                else {
+                    forceMultiplier = 2f;
                 }
                 if (!isWater) {
                     playerRb.velocity = Vector2.zero;
                 }
                 Vector2 collisionDirection = player.position - transform.position;
                 collisionDirection.Normalize();
-                Vector2 force = collisionDirection * debugForceMagnitude * collisionForceMultiplier * waterMultiplier;
+                Vector2 force = collisionDirection * debugForceMagnitude * collisionForceMultiplier * forceMultiplier;
                 playerRb.AddForce(force, ForceMode2D.Impulse);
 
                 // Apply opposite force to hazards

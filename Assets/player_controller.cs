@@ -6,6 +6,7 @@ public class PlayerController : MonoBehaviour
     public float damping = 0.95f;
     public float airMultiplier = 0.1f;
     public float maxAirSpeed = 5f;
+    public bool inWind = false;
     public bool grounded = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
@@ -65,6 +66,24 @@ public class PlayerController : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = false;
+        }
+    }
+
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        // Check if player enters wind
+        if (other.CompareTag("Wind"))
+        {
+            inWind = true;
+        }
+    }
+
+    void OnTriggerExit2D(Collider2D other)
+    {
+        // Check if player exits wind
+        if (other.CompareTag("Wind"))
+        {
+            inWind = false;
         }
     }
 }
