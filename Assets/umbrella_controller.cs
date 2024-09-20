@@ -1,19 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class UmbrellaController : MonoBehaviour
+public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaActions
 {
     public Transform player;
     public float displacement = 1.0f; 
-    public float forceMagnitude = 10f; 
+    public float forceMagnitude = 100f;
     public float slowFallGravityScale = 0.1f; 
     public Color slowedColor = Color.blue; 
     public float slowFallSpeed = 1f; 
     public bool umbrellaOpen = false;
     public float umbrellaAngle = 0;
-    private Vector3 closedSize = new Vector3(0.5f, 1.5f, 1f); 
-    private Vector3 openSize = new Vector3(2f, 0.5f, 1f); 
+    private Vector3 closedSize = new Vector3(0.25f, 2f, 1f); 
+    private Vector3 openSize = new Vector3(2.5f, 0.5f, 1f); 
     private bool wasM1 = false;
     private Rigidbody2D playerRb;
     private SpriteRenderer playerSpriteRenderer;
@@ -28,44 +29,76 @@ public class UmbrellaController : MonoBehaviour
     private bool isUmbrellaFacingDown = false; 
     private float lastCollisionTime = 0f; 
 
+    private UmbrellaInputActions inputActions;
+    private Vector2 orientInput;
+    private Vector2 previousOrientInput;
+    private float releaseThreshold = 0.4f;
+    private float launchCooldown = 0.5f;
+    private float lastLaunchTime = 0f; 
+
+    void Awake()
+    {
+        inputActions = new UmbrellaInputActions();
+        inputActions.Umbrella.SetCallbacks(this);
+        playerRb = player.GetComponent<Rigidbody2D>();
+        playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
+        playerController = player.GetComponent<PlayerController>();
+    }
+
+    void OnEnable()
+    {
+        inputActions.Umbrella.Enable();
+    }
+
+    void OnDisable()
+    {
+        inputActions.Umbrella.Disable();
+    }
+
     void Start()
     {
         // Close umbrella on start
         transform.localScale = closedSize;
-        playerRb = player.GetComponent<Rigidbody2D>();
         originalGravityScale = playerRb.gravityScale; 
-        playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         originalColor = playerSpriteRenderer.color; 
-        playerController = player.GetComponent<PlayerController>();
         playerRb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     void Update()
     {
-        // Grab cursor
-        Vector3 direction = Vector3.zero;
-        Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        mousePosition.z = 0;
-        direction = mousePosition - player.position;
-        direction.Normalize();
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-        if (angle < 0)
-        {
-            angle += 360f;
-        }
-        transform.position = player.position + direction * displacement; 
-        transform.rotation = Quaternion.Euler(0, 0, angle);
+        // Calculate direction based on right joystick input
+        Vector3 direction = new Vector3(orientInput.x, orientInput.y, 0).normalized;
+        float joystickMagnitude = orientInput.magnitude;
 
-        if (Input.GetMouseButton(0)) 
+        // Ignore input if below minimum threshold
+        if (joystickMagnitude < 0.1f)
         {
-            transform.localScale = openSize;
-            wasM1 = true;
-            umbrellaOpen = true;
+            direction = Vector3.zero;
+        }
+
+        if (direction != Vector3.zero)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            if (angle < 0)
+            {
+                angle += 360f;
+            }
+            transform.position = player.position + direction * displacement; 
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+
+            // Interpolate between open and closed
+            transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
+
+            // Set umbrellaOpen to true only if umbrella >25% 
+            umbrellaOpen = joystickMagnitude >= 0.25f;
 
             umbrellaAngle = angle;
 
-            // Umbrella air float (disregard floating when player or ubrella are in wind)
-            if ((angle > 315f || angle < 45f) && !transform.parent.GetComponent<PlayerController>().inWind)
+            // Check if player or umbrella is in an air element
+            bool isInWind = playerController.inWind;
+
+            // Umbrella air float
+            if ((angle > 315f || angle < 45f) && !isInWind)
             {
                 playerRb.gravityScale = 0f;
                 playerSpriteRenderer.color = slowedColor;
@@ -91,12 +124,20 @@ public class UmbrellaController : MonoBehaviour
             ResetGravityAndColor();
             isUmbrellaFacingDown = false;
 
-            if (wasM1 && playerController.grounded)
+            // Check if joystick quickly released and player grounded
+            if (previousOrientInput.magnitude > releaseThreshold && orientInput.magnitude <= releaseThreshold && playerController.grounded)
             {
-                playerRb.AddForce(new Vector2(direction.x, direction.y) * forceMagnitude, ForceMode2D.Impulse);
+                // Calculate launch force based on umbrella width
+                float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientInput.magnitude);
+                playerRb.AddForce(new Vector2(previousOrientInput.x, previousOrientInput.y) * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
+                lastLaunchTime = Time.time;
             }
+
             wasM1 = false;
         }
+
+        // Store the current orientInput for the next frame
+        previousOrientInput = orientInput;
     }
 
     void OnTriggerStay2D(Collider2D other)
@@ -144,7 +185,7 @@ public class UmbrellaController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (umbrellaOpen && playerRb.gravityScale == 0f)
+        if (umbrellaOpen && playerRb.gravityScale == 0f && Time.time - lastLaunchTime > launchCooldown)
         {
             playerRb.velocity = new Vector2(playerRb.velocity.x, -slowFallSpeed);
         }
@@ -154,5 +195,10 @@ public class UmbrellaController : MonoBehaviour
     {
         playerRb.gravityScale = originalGravityScale;
         playerSpriteRenderer.color = originalColor;
+    }
+
+    public void OnOrient(InputAction.CallbackContext context)
+    {
+        orientInput = context.ReadValue<Vector2>();
     }
 }

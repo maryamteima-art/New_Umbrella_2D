@@ -1,0 +1,34 @@
+{
+    "name": "UmbrellaControls",
+    "maps": [
+        {
+            "name": "Umbrella",
+            "id": "3a6d87ab-d3f1-422a-b136-8d914c8d2f26",
+            "actions": [
+                {
+                    "name": "Orient",
+                    "type": "Value",
+                    "id": "e7819e04-12b6-43a6-8165-c0f8e390ba5a",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "88dbec96-4498-43e5-946d-88bdefbf8dcf",
+                    "path": "<Gamepad>/rightStick",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Orient",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": []
+}

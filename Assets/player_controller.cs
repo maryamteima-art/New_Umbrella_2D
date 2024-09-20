@@ -1,6 +1,7 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
     public float moveSpeed = 10f;
     public float damping = 0.95f;
@@ -11,29 +12,46 @@ public class PlayerController : MonoBehaviour
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
 
+    private PlayerInputActions inputActions;
+    private Vector2 moveInput;
+
+    void Awake()
+    {
+        inputActions = new PlayerInputActions();
+        inputActions.Player.SetCallbacks(this);
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    void OnEnable()
+    {
+        inputActions.Player.Enable();
+    }
+
+    void OnDisable()
+    {
+        inputActions.Player.Disable();
+    }
+
     void Start()
     {
         // Get player and prevent tilting
-        rb = GetComponent<Rigidbody2D>();
         rb.freezeRotation = true;
     }
 
     void Update()
     {
-        // Get user input
-        float moveInput = Input.GetAxis("Horizontal");
         // Apply forces
         if (!umbrellaActive)
         {
             if (grounded)
             {
-                // If on the ground, apply ground force logic
-                rb.AddForce(Vector2.right * moveInput * moveSpeed, ForceMode2D.Force);
+                // If on ground, apply ground force logic
+                rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
             }
             else
             {
-                // If in the air, work with air control (drift slower logic)
-                float airControl = moveInput * moveSpeed * airMultiplier;
+                // If in air, work with air control (drift slower logic)
+                float airControl = moveInput.x * moveSpeed * airMultiplier;
                 rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
                 // Calculate and apply aerial velocity
                 Vector2 velocity = rb.velocity;
@@ -85,5 +103,10 @@ public class PlayerController : MonoBehaviour
         {
             inWind = false;
         }
+    }
+
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        moveInput = context.ReadValue<Vector2>();
     }
 }
