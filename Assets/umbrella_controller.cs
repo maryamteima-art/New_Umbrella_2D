@@ -117,7 +117,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if (joystickMagnitude >= 0.25f && !wasUmbrellaOpen)
             {
                 ////PLAY VFX for umbrella Open when transitioning from closed to open
-                VFXManager.Instance.PlayVFX("Open", transform.position);
+                VFXManager.Instance.PlayVFX("Open", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = true;
             }
             
@@ -153,7 +153,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if (wasUmbrellaOpen)
             {
                 //PLAY VFX for umbrella close
-                VFXManager.Instance.PlayVFX("Close_TextOnly", transform.position);
+                VFXManager.Instance.PlayVFX("Close_TextOnly", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = false;
             }
 
@@ -267,8 +267,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 }
                 if (!isWater) {
                     playerRb.velocity = Vector2.zero;
-                    //PLAY VFX ouch/impact for hitting a hazard
-                    VFXManager.Instance.PlayVFX("StrokeExplosion", transform.position);
+                    //PLAY VFX ouch/impact for hitting a hazard (&Move VFX 0.5 units upwards)
+                    VFXManager.Instance.PlayVFX("LinesExplosion", transform.position + new Vector3(0, 0.5f, 0));
                 }
                 Vector2 collisionDirection = player.position - transform.position;
                 collisionDirection.Normalize();
