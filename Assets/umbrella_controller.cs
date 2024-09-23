@@ -267,6 +267,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 }
                 if (!isWater) {
                     playerRb.velocity = Vector2.zero;
+                    //PLAY VFX ouch/impact for hitting a hazard
+                    VFXManager.Instance.PlayVFX("StrokeExplosion", transform.position);
                 }
                 Vector2 collisionDirection = player.position - transform.position;
                 collisionDirection.Normalize();
@@ -284,6 +286,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 lastCollisionTime = Time.time;
             }
         }
+
     }
 
     void FixedUpdate()
