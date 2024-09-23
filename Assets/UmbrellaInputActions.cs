@@ -35,6 +35,15 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Swing"",
+                    ""type"": ""Value"",
+                    ""id"": ""843e8611-e5b1-4e3e-a76f-67bde47f1335"",
+                    ""expectedControlType"": ""Axis"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -48,6 +57,17 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
                     ""action"": ""Orient"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""f35a7105-7642-46cf-8a29-9cce1e5cbb39"",
+                    ""path"": ""<Gamepad>/rightTrigger"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Swing"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -57,6 +77,7 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
         // Umbrella
         m_Umbrella = asset.FindActionMap("Umbrella", throwIfNotFound: true);
         m_Umbrella_Orient = m_Umbrella.FindAction("Orient", throwIfNotFound: true);
+        m_Umbrella_Swing = m_Umbrella.FindAction("Swing", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -119,11 +140,13 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Umbrella;
     private List<IUmbrellaActions> m_UmbrellaActionsCallbackInterfaces = new List<IUmbrellaActions>();
     private readonly InputAction m_Umbrella_Orient;
+    private readonly InputAction m_Umbrella_Swing;
     public struct UmbrellaActions
     {
         private @UmbrellaInputActions m_Wrapper;
         public UmbrellaActions(@UmbrellaInputActions wrapper) { m_Wrapper = wrapper; }
         public InputAction @Orient => m_Wrapper.m_Umbrella_Orient;
+        public InputAction @Swing => m_Wrapper.m_Umbrella_Swing;
         public InputActionMap Get() { return m_Wrapper.m_Umbrella; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -136,6 +159,9 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
             @Orient.started += instance.OnOrient;
             @Orient.performed += instance.OnOrient;
             @Orient.canceled += instance.OnOrient;
+            @Swing.started += instance.OnSwing;
+            @Swing.performed += instance.OnSwing;
+            @Swing.canceled += instance.OnSwing;
         }
 
         private void UnregisterCallbacks(IUmbrellaActions instance)
@@ -143,6 +169,9 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
             @Orient.started -= instance.OnOrient;
             @Orient.performed -= instance.OnOrient;
             @Orient.canceled -= instance.OnOrient;
+            @Swing.started -= instance.OnSwing;
+            @Swing.performed -= instance.OnSwing;
+            @Swing.canceled -= instance.OnSwing;
         }
 
         public void RemoveCallbacks(IUmbrellaActions instance)
@@ -163,5 +192,6 @@ public partial class @UmbrellaInputActions: IInputActionCollection2, IDisposable
     public interface IUmbrellaActions
     {
         void OnOrient(InputAction.CallbackContext context);
+        void OnSwing(InputAction.CallbackContext context);
     }
 }

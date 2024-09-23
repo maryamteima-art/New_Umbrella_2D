@@ -32,14 +32,24 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private UmbrellaInputActions inputActions;
     private Vector2 orientInput;
     private Vector2 previousOrientInput;
-    private float releaseThreshold = 0.4f;
+    private float releaseThreshold = 0.1f; // Lowered threshold for more leniency
     private float launchCooldown = 0.5f;
     private float lastLaunchTime = 0f; 
+    private bool isSwinging = false;
+    private float swingDuration = 0.25f; // Duration of the swing in seconds (halved for double speed)
+    private float swingStartTime;
+    private float swingExtent; // Maximum swing angle based on trigger pull depth
+    private float currentSwingSpeed; // Current swing speed based on trigger depth
+    private Vector3 originalPosition; // Store the original position of the umbrella
+    private Quaternion originalRotation; // Store the original rotation of the umbrella
+    private bool isFacingRight = true; // Store the player's last direction
 
     void Awake()
     {
         inputActions = new UmbrellaInputActions();
         inputActions.Umbrella.SetCallbacks(this);
+        inputActions.Umbrella.Swing.performed += ctx => StartSwing(ctx.ReadValue<float>());
+        inputActions.Umbrella.Swing.canceled += ctx => StopSwing();
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         playerController = player.GetComponent<PlayerController>();
@@ -125,7 +135,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             isUmbrellaFacingDown = false;
 
             // Check if joystick quickly released and player grounded
-            if (previousOrientInput.magnitude > releaseThreshold && orientInput.magnitude <= releaseThreshold && playerController.grounded)
+            if (previousOrientInput.magnitude > releaseThreshold && orientInput.magnitude < releaseThreshold && playerController.grounded)
             {
                 // Calculate launch force based on umbrella width
                 float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientInput.magnitude);
@@ -136,8 +146,72 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             wasM1 = false;
         }
 
-        // Store the current orientInput for the next frame
+        if (isSwinging)
+        {
+            PerformSwing();
+        }
+
+        // Store previous input (for direction)
         previousOrientInput = orientInput;
+    }
+
+    void StartSwing(float triggerDepth)
+    {
+        isSwinging = true;
+        swingStartTime = Time.time;
+        umbrellaOpen = false;
+        transform.localScale = closedSize;
+        playerRb.gravityScale = originalGravityScale; 
+        playerSpriteRenderer.color = originalColor; 
+        swingExtent = Mathf.Lerp(90, -30, triggerDepth); 
+        currentSwingSpeed = Mathf.Lerp(2f, 0.5f, triggerDepth); 
+        originalPosition = transform.position; 
+        originalRotation = transform.rotation; 
+    }
+
+    void StopSwing()
+    {
+        // Reset umbrella position (this is broken as hell and needs work)
+        isSwinging = false;
+        transform.position = originalPosition; 
+        transform.rotation = originalRotation; 
+    }
+
+    void PerformSwing()
+    {
+        float elapsedTime = Time.time - swingStartTime;
+        if (elapsedTime < swingDuration / currentSwingSpeed)
+        {
+            float swingProgress = elapsedTime / (swingDuration / currentSwingSpeed);
+            // Swing "animation"
+            float swingAngle = Mathf.Lerp(90, swingExtent, swingProgress);
+            if (!isFacingRight)
+            {
+                // Inverse swing when facing left
+                swingAngle = 180 - swingAngle;
+            }
+            Vector3 direction = new Vector3(Mathf.Cos(swingAngle * Mathf.Deg2Rad), Mathf.Sin(swingAngle * Mathf.Deg2Rad), 0);
+            transform.position = player.position + direction * displacement;
+            // Change rotation to match direction
+            transform.rotation = Quaternion.Euler(0, 0, swingAngle - 90f);
+        }
+        else
+        {
+            StopSwing();
+        }
+    }
+
+    // Swinging (this is busted and needs work)
+    public void OnSwing(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            StartSwing(context.ReadValue<float>());
+        }
+        else if (context.canceled)
+        {
+            StopSwing();
+        }
     }
 
     void OnTriggerStay2D(Collider2D other)
@@ -200,5 +274,13 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public void OnOrient(InputAction.CallbackContext context)
     {
         orientInput = context.ReadValue<Vector2>();
+        if (orientInput.x > 0)
+        {
+            isFacingRight = true;
+        }
+        else if (orientInput.x < 0)
+        {
+            isFacingRight = false;
+        }
     }
 }

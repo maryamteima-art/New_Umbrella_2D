@@ -14,6 +14,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
+    private bool lastDirectionRight = true; // true for right, false for left
 
     void Awake()
     {
@@ -67,6 +68,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             velocity.x *= damping;
             rb.velocity = velocity;
         }
+
+        // Update last direction based on move input
+        if (moveInput.x > 0)
+        {
+            lastDirectionRight = true;
+        }
+        else if (moveInput.x < 0)
+        {
+            lastDirectionRight = false;
+        }
     }
 
     void OnCollisionStay2D(Collision2D collision)
@@ -75,6 +86,17 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = true;
+        }
+
+        // Check if player touches a hazard
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Hazard"))
+        {
+            // Find the spawner and teleport the player back to it
+            GameObject spawner = GameObject.FindGameObjectWithTag("Player Spawn");
+            if (spawner != null)
+            {
+                transform.position = spawner.transform.position;
+            }
         }
     }
 
@@ -96,10 +118,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         }
     }
 
-    void OnTriggerExit2D(Collider2D other)
+    void OnTriggerExit2D(Collider2D trigger)
     {
         // Check if player exits wind
-        if (other.CompareTag("Wind"))
+        if (trigger.CompareTag("Wind"))
         {
             inWind = false;
         }
