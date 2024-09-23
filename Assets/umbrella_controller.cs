@@ -27,7 +27,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public float debugForceMagnitude = 10f; 
     public float collisionCooldown = 0.1f; 
     private bool isUmbrellaFacingDown = false; 
-    private float lastCollisionTime = 0f; 
+    private float lastCollisionTime = 0f;
+
 
     private UmbrellaInputActions inputActions;
     private Vector2 orientInput;
@@ -43,6 +44,10 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private Vector3 originalPosition; // Store the original position of the umbrella
     private Quaternion originalRotation; // Store the original rotation of the umbrella
     private bool isFacingRight = true; // Store the player's last direction
+
+    //--------- VARIABLES FOR VFX SYSTEM -----------
+    //Track the previous state of the umbrella
+    private bool wasUmbrellaOpen = false;
 
     void Awake()
     {
@@ -107,6 +112,15 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             // Check if player or umbrella is in an air element
             bool isInWind = playerController.inWind;
 
+            //UMBRELLA OPEN VFX CHECKER//
+            // Check if umbrella is open
+            if (joystickMagnitude >= 0.25f && !wasUmbrellaOpen)
+            {
+                ////PLAY VFX for umbrella Open when transitioning from closed to open
+                VFXManager.Instance.PlayVFX("Open", transform.position);
+                wasUmbrellaOpen = true;
+            }
+            
             // Umbrella air float
             if ((angle > 315f || angle < 45f) && !isInWind)
             {
@@ -134,6 +148,18 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             ResetGravityAndColor();
             isUmbrellaFacingDown = false;
 
+           
+            //Only play VFX when transitioning from open to closed
+            if (wasUmbrellaOpen)
+            {
+                //PLAY VFX for umbrella close
+                VFXManager.Instance.PlayVFX("Close", transform.position);
+                wasUmbrellaOpen = false;
+            }
+
+
+
+
             // Check if joystick quickly released and player grounded
             if (previousOrientInput.magnitude > releaseThreshold && orientInput.magnitude < releaseThreshold && playerController.grounded)
             {
@@ -141,6 +167,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientInput.magnitude);
                 playerRb.AddForce(new Vector2(previousOrientInput.x, previousOrientInput.y) * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
                 lastLaunchTime = Time.time;
+
+                //PLAY VFX for dashing
+                VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
             }
 
             wasM1 = false;
