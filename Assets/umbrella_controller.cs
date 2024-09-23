@@ -153,7 +153,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if (wasUmbrellaOpen)
             {
                 //PLAY VFX for umbrella close
-                VFXManager.Instance.PlayVFX("Close", transform.position);
+                VFXManager.Instance.PlayVFX("Close_TextOnly", transform.position);
                 wasUmbrellaOpen = false;
             }
 
