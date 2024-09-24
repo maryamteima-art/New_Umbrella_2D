@@ -111,6 +111,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             {
                 VFXManager.Instance.PlayVFX("Open", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = true;
+
+                //SoundFX
+                SoundFXManager.instance.PlayUmbrellaOpenClip(transform, 1f);
             }
 
             if ((angle > 315f || angle < 45f) && !isInWind)
@@ -141,6 +144,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             {
                 VFXManager.Instance.PlayVFX("Close_TextOnly", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = false;
+
+                //SoundFX
+                SoundFXManager.instance.PlayUmbrellaCloseClip(transform, 1f);
             }
 
             if (previousOrientationInput.magnitude > releaseThreshold && orientationInput.magnitude < releaseThreshold && playerController.grounded)
