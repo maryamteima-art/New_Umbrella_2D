@@ -14,6 +14,8 @@ public class SoundFXManager : MonoBehaviour
     // sound effects (can load here, or can load on gameObjects instead)
     [SerializeField] private AudioClip soundFX_umbrellaClose;
     [SerializeField] private AudioClip soundFX_umbrellaOpen;
+    [SerializeField] private AudioClip soundFX_landWater;
+    [SerializeField] private AudioClip soundFX_inWind;
 
 
 
@@ -88,5 +90,45 @@ public class SoundFXManager : MonoBehaviour
         Destroy(audioSource.gameObject, clipLength);
     }
 
+    public void PlayLandWaterClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
 
+        // assign audioclip
+        audioSource.clip = soundFX_landWater;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public void PlayInWindClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_inWind;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
 }

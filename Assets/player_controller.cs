@@ -11,6 +11,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public bool grounded = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
+    // for SoundFX
+    public float windCollisionCooldown = 1f;
+    private float lastCollisionTime = 0f;
 
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
@@ -121,6 +124,13 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (other.CompareTag("Wind"))
         {
             inWind = true;
+
+            if (Time.time - lastCollisionTime >= windCollisionCooldown) 
+            {
+                //SoundFX
+                SoundFXManager.instance.PlayInWindClip(transform, 0.5f);
+            }
+               
         }
     }
 
@@ -131,6 +141,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             inWind = false;
         }
+        lastCollisionTime = Time.time;
     }
 
     public void OnMove(InputAction.CallbackContext context)

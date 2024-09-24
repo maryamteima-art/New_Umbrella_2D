@@ -18,6 +18,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public float collisionForceMultiplier = 0.5f; 
     public float debugForceMagnitude = 10f; 
     public float collisionCooldown = 0.1f; 
+    // for water SoundFX
+    public float waterCollisionCooldown = 0.25f; 
 
     private Vector3 closedSize = new Vector3(0.25f, 2f, 1f); 
     private Vector3 openSize = new Vector3(2.5f, 0.5f, 1f); 
@@ -235,6 +237,22 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         {
             StopSwing();
         }
+    }
+
+    void OnTriggerEnter2D(Collider2D other) 
+    {
+        if (Time.time - lastCollisionTime >= waterCollisionCooldown) 
+        {
+            bool isWater = other.CompareTag("Water");
+
+            if (isWater && isUmbrellaFacingDown)
+            {
+                //SoundFX
+                SoundFXManager.instance.PlayLandWaterClip(transform, 1f);
+            }
+        }
+            
+
     }
 
     void OnTriggerStay2D(Collider2D other)
