@@ -13,6 +13,12 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public float slowFallSpeed = 1f; 
     public bool umbrellaOpen = false;
     public float umbrellaAngle = 0;
+    public Color umbrellaDownColor = Color.green; 
+    public LayerMask hazardLayer; 
+    public float collisionForceMultiplier = 0.5f; 
+    public float debugForceMagnitude = 10f; 
+    public float collisionCooldown = 0.1f; 
+
     private Vector3 closedSize = new Vector3(0.25f, 2f, 1f); 
     private Vector3 openSize = new Vector3(2.5f, 0.5f, 1f); 
     private bool wasM1 = false;
@@ -21,34 +27,25 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private Color originalColor;
     private float originalGravityScale;
     private PlayerController playerController;
-    public Color umbrellaDownColor = Color.green; 
-    public LayerMask hazardLayer; 
-    public float collisionForceMultiplier = 0.5f; 
-    public float debugForceMagnitude = 10f; 
-    public float collisionCooldown = 0.1f; 
     private bool isUmbrellaFacingDown = false; 
     private float lastCollisionTime = 0f;
-
-
     private UmbrellaInputActions inputActions;
-    private Vector2 orientInput;
-    private Vector2 previousOrientInput;
-    private float releaseThreshold = 0.1f; // Lowered threshold for more leniency
+    private Vector2 orientationInput;
+    private Vector2 previousOrientationInput;
+    private float releaseThreshold = 0.1f; 
     private float launchCooldown = 0.5f;
     private float lastLaunchTime = 0f; 
-    private bool isSwinging = false;
-    private float swingDuration = 0.25f; // Duration of the swing in seconds (halved for double speed)
+    public bool isSwinging = false;
+    private float swingDuration = 0.25f; 
     private float swingStartTime;
-    private float swingExtent; // Maximum swing angle based on trigger pull depth
-    private float currentSwingSpeed; // Current swing speed based on trigger depth
-    private Vector3 originalPosition; // Store the original position of the umbrella
-    private Quaternion originalRotation; // Store the original rotation of the umbrella
-    private bool isFacingRight = true; // Store the player's last direction
-
-    //--------- VARIABLES FOR VFX SYSTEM -----------
-    //Track the previous state of the umbrella
+    private float swingExtent; 
+    public float currentSwingSpeed; 
+    private Vector3 originalPosition; 
+    private Quaternion originalRotation; 
+    private bool isFacingRight = true; 
     private bool wasUmbrellaOpen = false;
 
+    /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
     {
         inputActions = new UmbrellaInputActions();
@@ -72,20 +69,26 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
     void Start()
     {
-        // Close umbrella on start
         transform.localScale = closedSize;
         originalGravityScale = playerRb.gravityScale; 
         originalColor = playerSpriteRenderer.color; 
         playerRb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
+    /* Wait and check for umbrella rotations and swings  */
     void Update()
     {
-        // Calculate direction based on right joystick input
-        Vector3 direction = new Vector3(orientInput.x, orientInput.y, 0).normalized;
-        float joystickMagnitude = orientInput.magnitude;
+        HandleUmbrellaOrientation();
+        HandleSwinging();
+        previousOrientationInput = orientationInput;
+    }
 
-        // Ignore input if below minimum threshold
+    /* Calculate and apply necessary umbrella orientation */
+    void HandleUmbrellaOrientation()
+    {
+        Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
+        float joystickMagnitude = orientationInput.magnitude;
+
         if (joystickMagnitude < 0.1f)
         {
             direction = Vector3.zero;
@@ -94,47 +97,33 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         if (direction != Vector3.zero)
         {
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            if (angle < 0)
-            {
-                angle += 360f;
-            }
+            if (angle < 0) angle += 360f;
+
             transform.position = player.position + direction * displacement; 
             transform.rotation = Quaternion.Euler(0, 0, angle);
-
-            // Interpolate between open and closed
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
-
-            // Set umbrellaOpen to true only if umbrella >25% 
             umbrellaOpen = joystickMagnitude >= 0.25f;
-
             umbrellaAngle = angle;
 
-            // Check if player or umbrella is in an air element
             bool isInWind = playerController.inWind;
 
-            //UMBRELLA OPEN VFX CHECKER//
-            // Check if umbrella is open
             if (joystickMagnitude >= 0.25f && !wasUmbrellaOpen)
             {
-                ////PLAY VFX for umbrella Open when transitioning from closed to open
                 VFXManager.Instance.PlayVFX("Open", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = true;
             }
-            
-            // Umbrella air float
+
             if ((angle > 315f || angle < 45f) && !isInWind)
             {
                 playerRb.gravityScale = 0f;
                 playerSpriteRenderer.color = slowedColor;
                 isUmbrellaFacingDown = false;
             }
-            // Umbrella water float
             else if (angle > 135f && angle < 225f)
             {
                 playerSpriteRenderer.color = umbrellaDownColor;
                 isUmbrellaFacingDown = true;
             }
-            // Default
             else
             {
                 ResetGravityAndColor();
@@ -148,40 +137,30 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             ResetGravityAndColor();
             isUmbrellaFacingDown = false;
 
-           
-            //Only play VFX when transitioning from open to closed
             if (wasUmbrellaOpen)
             {
-                //PLAY VFX for umbrella close
                 VFXManager.Instance.PlayVFX("Close_TextOnly", transform.position + new Vector3(0, 0.5f, 0));
                 wasUmbrellaOpen = false;
             }
 
-
-
-
-            // Check if joystick quickly released and player grounded
-            if (previousOrientInput.magnitude > releaseThreshold && orientInput.magnitude < releaseThreshold && playerController.grounded)
+            if (previousOrientationInput.magnitude > releaseThreshold && orientationInput.magnitude < releaseThreshold && playerController.grounded)
             {
-                // Calculate launch force based on umbrella width
-                float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientInput.magnitude);
-                playerRb.AddForce(new Vector2(previousOrientInput.x, previousOrientInput.y) * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
+                float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientationInput.magnitude);
+                playerRb.AddForce(new Vector2(previousOrientationInput.x, previousOrientationInput.y) * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
                 lastLaunchTime = Time.time;
-
-                //PLAY VFX for dashing
                 VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
             }
 
             wasM1 = false;
         }
+    }
 
+    void HandleSwinging()
+    {
         if (isSwinging)
         {
             PerformSwing();
         }
-
-        // Store previous input (for direction)
-        previousOrientInput = orientInput;
     }
 
     void StartSwing(float triggerDepth)
@@ -200,10 +179,23 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
     void StopSwing()
     {
-        // Reset umbrella position (this is broken as hell and needs work)
         isSwinging = false;
-        transform.position = originalPosition; 
-        transform.rotation = originalRotation; 
+        Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
+        float joystickMagnitude = orientationInput.magnitude;
+
+        if (joystickMagnitude < 0.1f)
+        {
+            direction = Vector3.zero;
+        }
+
+        if (direction != Vector3.zero)
+        {
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+            if (angle < 0) angle += 360f;
+
+            transform.position = player.position + direction * displacement;
+            transform.rotation = Quaternion.Euler(0, 0, angle);
+        }
     }
 
     void PerformSwing()
@@ -212,17 +204,14 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         if (elapsedTime < swingDuration / currentSwingSpeed)
         {
             float swingProgress = elapsedTime / (swingDuration / currentSwingSpeed);
-            // Swing "animation"
             float swingAngle = Mathf.Lerp(90, swingExtent, swingProgress);
             if (!isFacingRight)
             {
-                // Inverse swing when facing left
                 swingAngle = 180 - swingAngle;
             }
             Vector3 direction = new Vector3(Mathf.Cos(swingAngle * Mathf.Deg2Rad), Mathf.Sin(swingAngle * Mathf.Deg2Rad), 0);
-            transform.position = player.position + direction * displacement;
-            // Change rotation to match direction
-            transform.rotation = Quaternion.Euler(0, 0, swingAngle - 90f);
+            transform.localPosition = direction * displacement;
+            transform.localRotation = Quaternion.Euler(0, 0, swingAngle - 90f);
         }
         else
         {
@@ -230,7 +219,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
     }
 
-    // Swinging (this is busted and needs work)
     public void OnSwing(InputAction.CallbackContext context)
     {
         if (context.performed)
@@ -255,19 +243,19 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 float forceMultiplier = 1f;
                 if (isWater && !isUmbrellaFacingDown)
                 {
-                    // Fall through water if umbrella not facing down
                     return;
                 } 
-                // Altered logic so instead of "rebounding," the player "floats." This also adds "pseudo surface tension"
-                else if (isWater && isUmbrellaFacingDown) {
+                else if (isWater && isUmbrellaFacingDown) 
+                {
                     forceMultiplier = 0.5f;
                 }
-                else {
+                else 
+                {
                     forceMultiplier = 2f;
                 }
-                if (!isWater) {
+                if (!isWater) 
+                {
                     playerRb.velocity = Vector2.zero;
-                    //PLAY VFX ouch/impact for hitting a hazard (&Move VFX 0.5 units upwards)
                     VFXManager.Instance.PlayVFX("LinesExplosion", transform.position + new Vector3(0, 0.5f, 0));
                 }
                 Vector2 collisionDirection = player.position - transform.position;
@@ -275,7 +263,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 Vector2 force = collisionDirection * debugForceMagnitude * collisionForceMultiplier * forceMultiplier;
                 playerRb.AddForce(force, ForceMode2D.Impulse);
 
-                // Apply opposite force to hazards
                 Rigidbody2D otherRb = other.GetComponent<Rigidbody2D>();
                 if (otherRb != null)
                 {
@@ -286,7 +273,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 lastCollisionTime = Time.time;
             }
         }
-
     }
 
     void FixedUpdate()
@@ -305,12 +291,12 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
     public void OnOrient(InputAction.CallbackContext context)
     {
-        orientInput = context.ReadValue<Vector2>();
-        if (orientInput.x > 0)
+        orientationInput = context.ReadValue<Vector2>();
+        if (orientationInput.x > 0)
         {
             isFacingRight = true;
         }
-        else if (orientInput.x < 0)
+        else if (orientationInput.x < 0)
         {
             isFacingRight = false;
         }

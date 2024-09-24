@@ -25,12 +25,18 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     void OnEnable()
     {
-        inputActions.Player.Enable();
+        if (inputActions != null)
+        {
+            inputActions.Player.Enable();
+        }
     }
 
     void OnDisable()
     {
-        inputActions.Player.Disable();
+        if (inputActions != null)
+        {
+            inputActions.Player.Disable();
+        }
     }
 
     void Start()
