@@ -2,28 +2,25 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class camera_controller : MonoBehaviour
+public class CameraController : MonoBehaviour
 {
     // Refs
     public Transform player;
-    public float smoothSpeed = 0.125f;
+    public float smoothTime = 0.3f;
     public Vector3 offset;
+
+    private Vector3 velocity = Vector3.zero;
 
     // Logic
     void LateUpdate()
     {
         // Calculate target location
-        Vector3 desiredPosition = new Vector3(player.position.x + offset.x, player.position.y + offset.y, transform.position.z);
-        // Lerp to smooth
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed);
+        Vector3 targetPosition = player.position + offset;
+        // Smooth damp to target
+        Vector3 smoothedPosition = Vector3.SmoothDamp(transform.position, targetPosition, ref velocity, smoothTime);
+        // Keep Z constant
+        smoothedPosition.z = transform.position.z;
         // Apply translation
         transform.position = smoothedPosition;
-
-        // Prevent player from leaving the screen
-        Vector3 viewPos = Camera.main.WorldToViewportPoint(player.position);
-        if (viewPos.x < 0.1f || viewPos.x > 0.9f || viewPos.y < 0.1f || viewPos.y > 0.9f)
-        {
-            transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * 2);
-        }
     }
 }
