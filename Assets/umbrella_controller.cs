@@ -46,6 +46,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private Quaternion originalRotation; 
     private bool isFacingRight = true; 
     private bool wasUmbrellaOpen = false;
+    private float previousUmbrellaWidth = 0f;
+    private float maxUmbrellaWidth = 0f;
 
     /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
@@ -104,6 +106,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             transform.position = player.position + direction * displacement; 
             transform.rotation = Quaternion.Euler(0, 0, angle);
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
+
             umbrellaOpen = joystickMagnitude >= 0.25f;
             umbrellaAngle = angle;
 
@@ -151,16 +154,40 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 SoundFXManager.instance.PlayUmbrellaCloseClip(transform, 1f);
             }
 
-            if (previousOrientationInput.magnitude > releaseThreshold && orientationInput.magnitude < releaseThreshold && playerController.grounded)
+
+            // Launch based on umbrella width with cooldown
+            if (orientationInput.magnitude < releaseThreshold && playerController.grounded && Time.time - lastLaunchTime > launchCooldown)
             {
-                float launchForceMultiplier = Mathf.Lerp(0.1f, 1.2f, previousOrientationInput.magnitude);
-                playerRb.AddForce(new Vector2(previousOrientationInput.x, previousOrientationInput.y) * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
-                lastLaunchTime = Time.time;
-                VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
+                if (previousOrientationInput.magnitude > releaseThreshold)
+                {
+                    float launchForceMultiplier = maxUmbrellaWidth / 2;
+
+                    Vector2 launchDirection = previousOrientationInput.normalized;
+                    playerRb.AddForce(launchDirection * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
+                    lastLaunchTime = Time.time;
+                    VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
+
+                    // Start ignoring ground collisions
+                    StartCoroutine(IgnoreGroundCollision());
+                }
             }
 
             wasM1 = false;
         }
+
+        float currentUmbrellaWidth = transform.localScale.x;
+
+        // Update max umbrella width logic
+        if (currentUmbrellaWidth > previousUmbrellaWidth)
+        {
+            maxUmbrellaWidth = currentUmbrellaWidth;
+        }
+        else if (currentUmbrellaWidth < previousUmbrellaWidth && currentUmbrellaWidth > maxUmbrellaWidth)
+        {
+            maxUmbrellaWidth = currentUmbrellaWidth;
+        }
+
+        previousUmbrellaWidth = currentUmbrellaWidth;
     }
 
     void HandleSwinging()
@@ -324,5 +351,18 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         {
             isFacingRight = false;
         }
+    }
+
+    private IEnumerator IgnoreGroundCollision()
+    {
+        Debug.Log("Setting isLaunching to true");
+        playerController.isLaunching = true;
+        Debug.Log($"isLaunching set to: {playerController.isLaunching}");
+        
+        yield return new WaitForSeconds(1f);
+        
+        Debug.Log("Setting isLaunching to false");
+        playerController.isLaunching = false;
+        Debug.Log($"isLaunching set to: {playerController.isLaunching}");
     }
 }
