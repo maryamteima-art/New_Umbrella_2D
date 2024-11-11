@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
@@ -23,6 +24,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public bool isLaunching = false;
     private float launchTime = 0f;
     private float launchDuration = 2.5f;
+
+    private float shakeMagnitude = 0.1f; // Define shake magnitude
 
     void Awake()
     {
@@ -96,21 +99,31 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     void OnCollisionStay2D(Collision2D collision)
     {
-        // Check if player is touching the ground
-        if (!isLaunching && collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = true;
-        }
-
         // Check if player touches a hazard
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hazard"))
         {
-            // Find the spawner and teleport the player back to it
-            GameObject spawner = GameObject.FindGameObjectWithTag("Player Spawn");
-            if (spawner != null)
-            {
-                transform.position = spawner.transform.position;
-            }
+            HitStop(250, () => {
+                // Find the spawner closest to the left of the player
+                GameObject[] spawners = GameObject.FindGameObjectsWithTag("Player Spawn");
+                GameObject closestSpawner = null;
+                float playerX = transform.position.x;
+                float closestX = float.MinValue;
+
+                foreach (GameObject spawner in spawners)
+                {
+                    float spawnerX = spawner.transform.position.x;
+                    if (spawnerX < playerX && spawnerX > closestX)
+                    {
+                        closestX = spawnerX;
+                        closestSpawner = spawner;
+                    }
+                }
+
+                if (closestSpawner != null)
+                {
+                    transform.position = closestSpawner.transform.position;
+                }
+            });
         }
     }
 
@@ -165,10 +178,46 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         moveInput = context.ReadValue<Vector2>();
     }
 
-    public void LaunchPlayer()
+    public void HitStop(float milliseconds, System.Action onComplete = null)
     {
-        isLaunching = true;
-        launchTime = Time.time;
-        Debug.Log($"LaunchPlayer called: isLaunching set to {isLaunching}, launchTime set to {launchTime}");
+        StartCoroutine(HitStopCoroutine(milliseconds, onComplete));
+    }
+
+    private IEnumerator HitStopCoroutine(float milliseconds, System.Action onComplete)
+    {
+        float originalTimeScale = Time.timeScale;
+        // Freeze game
+        Time.timeScale = 0f;
+        StartCoroutine(ScreenShakeCoroutine(milliseconds / 1000f));
+        yield return new WaitForSecondsRealtime(milliseconds / 1000f);
+        Time.timeScale = originalTimeScale;
+        // Execute callback
+        onComplete?.Invoke();
+    }
+
+    private IEnumerator ScreenShakeCoroutine(float duration)
+    {
+        Vector3 originalCameraPosition = Camera.main.transform.localPosition;
+        float elapsed = 0.0f;
+
+        while (elapsed < duration)
+        {
+            // Shake values
+            float x = Random.Range(-1f, 1f) * shakeMagnitude;
+            float y = Random.Range(-1f, 1f) * shakeMagnitude;
+
+            // Keep current camera position while shaking
+            Camera.main.transform.localPosition = new Vector3(
+                originalCameraPosition.x + x, 
+                originalCameraPosition.y + y, 
+                originalCameraPosition.z
+            );
+
+            // Shake despite hit stop
+            elapsed += Time.unscaledDeltaTime;
+            yield return null;
+        }
+
+        Camera.main.transform.localPosition = originalCameraPosition;
     }
 }
