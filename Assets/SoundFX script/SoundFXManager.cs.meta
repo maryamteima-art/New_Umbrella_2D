@@ -9,6 +9,7 @@ MonoImporter:
   - soundFX_umbrellaOpen: {fileID: 8300000, guid: 39a9b2d7c8b9d2f4f99016253ff07d04, type: 3}
   - soundFX_landWater: {fileID: 8300000, guid: 0b31bc6d48962cd4aad4027253113a7f, type: 3}
   - soundFX_inWind: {fileID: 8300000, guid: 8482c977b852c0e47aba929992fcdfbb, type: 3}
+  - soundFX_death: {fileID: 8300000, guid: 28092168c807c4c8f89688d51d4a878c, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

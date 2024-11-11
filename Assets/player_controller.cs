@@ -102,6 +102,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         // Check if player touches a hazard
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hazard"))
         {
+            SoundFXManager.instance.PlayDeathClip(transform, 0.5f);
             HitStop(250, () => {
                 // Find the spawner closest to the left of the player
                 GameObject[] spawners = GameObject.FindGameObjectsWithTag("Player Spawn");

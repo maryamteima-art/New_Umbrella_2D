@@ -16,6 +16,7 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_umbrellaOpen;
     [SerializeField] private AudioClip soundFX_landWater;
     [SerializeField] private AudioClip soundFX_inWind;
+    [SerializeField] private AudioClip soundFX_death;
 
 
 
@@ -130,5 +131,23 @@ public class SoundFXManager : MonoBehaviour
 
         // destroy after play
         Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public void PlayDeathClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_death;
+
+        // set volume
+        audioSource.volume = volume;
+
+        // play the sound
+        audioSource.Play();
+
+        // destroy after play
+        Destroy(audioSource.gameObject, audioSource.clip.length);
     }
 }
