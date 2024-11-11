@@ -25,12 +25,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     private float launchTime = 0f;
     private float launchDuration = 2.5f;
 
-    private float shakeMagnitude = 0.1f; // Define shake magnitude
+    private float shakeMagnitude = 0.1f;
 
-    public GameObject chargeMeter; // Reference to the charge meter object
+    public GameObject chargeMeter;
     private float chargeMeterInitialHeight;
 
-    private float chargeMeterDecreaseRate = 0f; // Rate at which the meter decreases
+    private float chargeMeterDecreaseRate = 0f;
 
     void Awake()
     {

@@ -286,7 +286,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             bool isHazard = ((1 << other.gameObject.layer) & hazardLayer) != 0;
             bool isWater = other.CompareTag("Water");
 
-            if (umbrellaOpen && isHazard)
+            if ((umbrellaOpen || isSwinging) && isHazard)
             {
                 float forceMultiplier = 1f;
                 if (isWater && !isUmbrellaFacingDown)
