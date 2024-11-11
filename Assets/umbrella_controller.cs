@@ -327,7 +327,12 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     {
         if (umbrellaOpen && playerRb.gravityScale == 0f && Time.time - lastLaunchTime > launchCooldown)
         {
-            playerRb.velocity = new Vector2(playerRb.velocity.x, -slowFallSpeed);
+            // Gradually reduce upward velocity to 30% of its current value when umbrella is open
+            float targetUpwardVelocity = Mathf.Max(playerRb.velocity.y, 0) * 0.3f;
+            float smoothedUpwardVelocity = Mathf.Lerp(playerRb.velocity.y, targetUpwardVelocity, Time.fixedDeltaTime * 5f);
+            
+            // Apply the smoothed velocity and slow fall speed
+            playerRb.velocity = new Vector2(playerRb.velocity.x, smoothedUpwardVelocity - slowFallSpeed * 0.2f);
         }
     }
 
