@@ -27,11 +27,17 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     private float shakeMagnitude = 0.1f; // Define shake magnitude
 
+    public GameObject chargeMeter; // Reference to the charge meter object
+    private float chargeMeterInitialHeight;
+
+    private float chargeMeterDecreaseRate = 0f; // Rate at which the meter decreases
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
         inputActions.Player.SetCallbacks(this);
         rb = GetComponent<Rigidbody2D>();
+        chargeMeterInitialHeight = chargeMeter.transform.localScale.y;
     }
 
     void OnEnable()
@@ -95,6 +101,46 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             lastDirectionRight = false;
         }
+
+        // Continuously update charge meter if the decrease rate is set
+        if (chargeMeterDecreaseRate > 0)
+        {
+            UpdateChargeMeter();
+        }
+    }
+
+    private void UpdateChargeMeter()
+    {
+        // Calculate new height based on time and decrease rate
+        float newHeight = chargeMeter.transform.localScale.y - (chargeMeterDecreaseRate * Time.deltaTime);
+        newHeight = Mathf.Max(newHeight, 0); // Ensure it doesn't go below zero
+
+        // Calculate the change in height
+        float heightDifference = chargeMeter.transform.localScale.y - newHeight;
+
+        // Apply new scale to the charge meter
+        Vector3 newScale = chargeMeter.transform.localScale;
+        newScale.y = newHeight;
+        chargeMeter.transform.localScale = newScale;
+
+        // Adjust position to decrease from the top
+        Vector3 newPosition = chargeMeter.transform.localPosition;
+        newPosition.y -= heightDifference / 2; 
+        chargeMeter.transform.localPosition = newPosition;
+
+        // Reset meter if grounded
+        if (grounded)
+        {
+            chargeMeter.transform.localScale = new Vector3(newScale.x, chargeMeterInitialHeight, newScale.z);
+            chargeMeter.transform.localPosition = new Vector3(newPosition.x, 0, newPosition.z);
+        }
+
+        // Don't push player up if meter empty
+        if (chargeMeterDecreaseRate > 0 && newHeight > 0)
+        {
+            float forceMagnitude = Mathf.Lerp(0.01f, 0.05f, chargeMeterDecreaseRate);
+            rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
+        }
     }
 
     void OnCollisionStay2D(Collision2D collision)
@@ -155,6 +201,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!isLaunching && other.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = true;
+            UpdateChargeMeter();
         }
     }
 
@@ -220,5 +267,21 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         }
 
         Camera.main.transform.localPosition = originalCameraPosition;
+    }
+
+    public void OnJetpack(InputAction.CallbackContext context)
+    {
+        // Check if the trigger is pressed or released
+        if (context.phase == InputActionPhase.Performed)
+        {
+            // Adjust decrease rate based on trigger input
+            float triggerValue = context.ReadValue<float>();
+            chargeMeterDecreaseRate = Mathf.Lerp(0.2f, 1f, triggerValue);
+        }
+        else if (context.phase == InputActionPhase.Canceled)
+        {
+            // Reset decrease rate when trigger is released
+            chargeMeterDecreaseRate = 0f;
+        }
     }
 }

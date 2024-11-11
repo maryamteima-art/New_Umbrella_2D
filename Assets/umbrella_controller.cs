@@ -155,7 +155,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             }
 
 
-            // Launch based on umbrella width with cooldown
+            // Launch based on umbrella width
             if (orientationInput.magnitude < releaseThreshold && playerController.grounded && Time.time - lastLaunchTime > launchCooldown)
             {
                 if (previousOrientationInput.magnitude > releaseThreshold)
@@ -166,9 +166,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                     playerRb.AddForce(launchDirection * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
                     lastLaunchTime = Time.time;
                     VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
-
-                    // Start ignoring ground collisions
-                    StartCoroutine(IgnoreGroundCollision());
                 }
             }
 
@@ -351,18 +348,5 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         {
             isFacingRight = false;
         }
-    }
-
-    private IEnumerator IgnoreGroundCollision()
-    {
-        Debug.Log("Setting isLaunching to true");
-        playerController.isLaunching = true;
-        Debug.Log($"isLaunching set to: {playerController.isLaunching}");
-        
-        yield return new WaitForSeconds(1f);
-        
-        Debug.Log("Setting isLaunching to false");
-        playerController.isLaunching = false;
-        Debug.Log($"isLaunching set to: {playerController.isLaunching}");
     }
 }
