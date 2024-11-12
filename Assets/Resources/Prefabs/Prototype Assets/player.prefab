@@ -61,7 +61,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: -0.51}
@@ -75,7 +75,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.01, y: 1}
+  m_Size: {x: 0.25, y: 1}
   m_EdgeRadius: 0
 --- !u!1 &393166459190496341
 GameObject:
@@ -499,3 +499,11 @@ MonoBehaviour:
   windCollisionCooldown: 1
   isLaunching: 0
   chargeMeter: {fileID: 1177445914493871216}
+  trailRenderer: {fileID: 0}
+  defaultTrailTime: 60
+  fadeOutSpeed: 0.5
+  groundCheck: {fileID: 4009059533285664678}
+  groundCheckRadius: 0.2
+  terrainLayer:
+    serializedVersion: 2
+    m_Bits: 0
