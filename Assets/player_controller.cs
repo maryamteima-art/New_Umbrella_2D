@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public bool grounded = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
+    // Animator
+    public Animator robotAnimator;
+    public SpriteRenderer robotSpriteRenderer;
+    
     // for SoundFX
     public float windCollisionCooldown = 1f;
     private float lastCollisionTime = 0f;
@@ -93,6 +97,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             {
                 // If on ground and not launching, apply ground force logic
                 rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
+                
+                //Animator
+                robotAnimator.SetBool("Grounded", grounded);
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
 
             }
             else if (!grounded)
@@ -120,10 +128,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (moveInput.x > 0)
         {
             lastDirectionRight = true;
+            
+            //Animator
+            robotSpriteRenderer.flipX = false;
         }
         else if (moveInput.x < 0)
         {
             lastDirectionRight = false;
+            
+            //Animator
+            robotSpriteRenderer.flipX = true;
         }
 
         // Continuously update charge meter if the decrease rate is set
@@ -326,6 +340,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = true;
+            
+            //Animator
+            robotAnimator.SetBool("Grounded", grounded);
         }
     }
 
@@ -335,6 +352,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = false;
+            
+            //Animator
+            robotAnimator.SetBool("Grounded", grounded);
         }
     }
 }
