@@ -49,6 +49,7 @@ public class GrassBendEffect : MonoBehaviour
         }
     }
 
+    //----------- CUSTOM/HELPER FUNCTIONS --------------
     private IEnumerator ApplyBendEffect(Vector3 targetScale)
     {
         //Gradually apply the bending effect
