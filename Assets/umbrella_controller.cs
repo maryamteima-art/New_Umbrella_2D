@@ -9,11 +9,15 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public float displacement = 1.0f; 
     public float forceMagnitude = 100f;
     public float slowFallGravityScale = 0.1f; 
-    public Color slowedColor = Color.blue; 
+    
+    public Color slowedColor = Color.magenta; 
+    
     public float slowFallSpeed = 1f; 
     public bool umbrellaOpen = false;
     public float umbrellaAngle = 0;
+    
     public Color umbrellaDownColor = Color.green; 
+    
     public LayerMask hazardLayer; 
     public float collisionForceMultiplier = 0.5f; 
     public float debugForceMagnitude = 10f; 
@@ -59,6 +63,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         playerController = player.GetComponent<PlayerController>();
+        
+        // Sprite adjustments
     }
 
     void OnEnable()
