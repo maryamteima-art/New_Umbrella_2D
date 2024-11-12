@@ -40,7 +40,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     //Trail object attached to the player (for gliding)
     public TrailRenderer trailRenderer;
     //The normal trail time when in wind
-    public float defaultTrailTime = 60.0f;
+    public float defaultTrailTime = 10.0f;
     //Speed of fade out of trail
     public float fadeOutSpeed = 0.5f; 
 
