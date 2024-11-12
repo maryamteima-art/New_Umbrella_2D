@@ -251,13 +251,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 SoundFXManager.instance.PlayInWindClip(transform, 0.5f);
             }
         }
-
-        // Check if player is grounded
-        if (!isLaunching && other.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = true;
-            UpdateChargeMeter();
-        }
     }
 
     void OnTriggerExit2D(Collider2D trigger)
@@ -340,6 +333,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = true;
+            UpdateChargeMeter();
             
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
@@ -352,6 +346,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
         {
             grounded = false;
+            UpdateChargeMeter();
             
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
