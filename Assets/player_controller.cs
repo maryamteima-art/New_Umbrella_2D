@@ -40,6 +40,11 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     //Speed of fade out of trail
     public float fadeOutSpeed = 0.5f; 
 
+    // Add a reference to the GroundCheck object
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
+    public LayerMask terrainLayer;
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -173,7 +178,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         // Don't push player up if meter empty
         if (chargeMeterDecreaseRate > 0 && newHeight > 0)
         {
-            float forceMagnitude = Mathf.Lerp(0.01f, 0.1f, chargeMeterDecreaseRate);
+            float forceMagnitude = Mathf.Lerp(0.01f, 0.05f, chargeMeterDecreaseRate);
             rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
         }
     }
@@ -206,15 +211,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                     transform.position = closestSpawner.transform.position;
                 }
             });
-        }
-    }
-
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        // Check if player is in the air
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = false;
         }
     }
 
@@ -258,12 +254,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             inWind = false;
         }
         lastCollisionTime = Time.time;
-
-        // Check if player is no longer grounded
-        if (trigger.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = false;
-        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -327,6 +317,24 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             // Reset decrease rate when trigger is released
             chargeMeterDecreaseRate = 0f;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Check if GroundCheck collides with Terrain
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            grounded = true;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        // Check if GroundCheck exits collision with Terrain
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            grounded = false;
         }
     }
 }
