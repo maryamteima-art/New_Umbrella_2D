@@ -38,8 +38,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     //The normal trail time when in wind
     public float defaultTrailTime = 60.0f;
     //Speed of fade out of trail
-    public float fadeOutSpeed = 0.5f;
-
+    public float fadeOutSpeed = 0.5f; 
 
     void Awake()
     {
