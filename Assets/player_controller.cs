@@ -12,6 +12,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public bool grounded = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
+    // Animator
+    public Animator robotAnimator;
+    public SpriteRenderer robotSpriteRenderer;
+    
     // for SoundFX
     public float windCollisionCooldown = 1f;
     private float lastCollisionTime = 0f;
@@ -40,6 +44,11 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     //Speed of fade out of trail
     public float fadeOutSpeed = 0.5f;
 
+
+    // Add a reference to the GroundCheck object
+    public Transform groundCheck;
+    public float groundCheckRadius = 0.2f;
+    public LayerMask terrainLayer;
 
     void Awake()
     {
@@ -89,6 +98,10 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             {
                 // If on ground and not launching, apply ground force logic
                 rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
+                
+                //Animator
+                robotAnimator.SetBool("Grounded", grounded);
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
 
             }
             else if (!grounded)
@@ -116,10 +129,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (moveInput.x > 0)
         {
             lastDirectionRight = true;
+            
+            //Animator
+            robotSpriteRenderer.flipX = false;
         }
         else if (moveInput.x < 0)
         {
             lastDirectionRight = false;
+            
+            //Animator
+            robotSpriteRenderer.flipX = true;
         }
 
         // Continuously update charge meter if the decrease rate is set
@@ -210,15 +229,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         }
     }
 
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        // Check if player is in the air
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = false;
-        }
-    }
-
     void OnTriggerEnter2D(Collider2D other)
     {
         // Check if player enters wind
@@ -259,12 +269,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             inWind = false;
         }
         lastCollisionTime = Time.time;
-
-        // Check if player is no longer grounded
-        if (trigger.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = false;
-        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -328,6 +332,30 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             // Reset decrease rate when trigger is released
             chargeMeterDecreaseRate = 0f;
+        }
+    }
+
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Check if GroundCheck collides with Terrain
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            grounded = true;
+            
+            //Animator
+            robotAnimator.SetBool("Grounded", grounded);
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D collision)
+    {
+        // Check if GroundCheck exits collision with Terrain
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+        {
+            grounded = false;
+            
+            //Animator
+            robotAnimator.SetBool("Grounded", grounded);
         }
     }
 }
