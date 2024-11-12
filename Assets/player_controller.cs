@@ -32,6 +32,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     private float chargeMeterDecreaseRate = 0f;
 
+    //FOR VFX
+    //Trail object attached to the player (for gliding)
+    public TrailRenderer trailRenderer;
+    //The normal trail time when in wind
+    public float defaultTrailTime = 60.0f;
+    //Speed of fade out of trail
+    public float fadeOutSpeed = 0.5f; 
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -60,6 +68,15 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
         // Get player and prevent tilting
         rb.freezeRotation = true;
+
+        //VFX: Find Trail Object attached to the Player
+        trailRenderer = GameObject.Find("Flight_Trail").GetComponent<TrailRenderer>();
+
+        //Ensure the trail is disabled at the start
+        if (trailRenderer != null)
+        {
+            trailRenderer.enabled = false;
+        }
     }
 
     void Update()
@@ -71,6 +88,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             {
                 // If on ground and not launching, apply ground force logic
                 rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
+
             }
             else if (!grounded)
             {
@@ -90,6 +108,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             Vector2 velocity = rb.velocity;
             velocity.x *= damping;
             rb.velocity = velocity;
+
         }
         
         // Update last direction based on move input
@@ -106,6 +125,22 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (chargeMeterDecreaseRate > 0)
         {
             UpdateChargeMeter();
+        }
+
+        //VFX: GRADUAL TRAIL DISABLE
+        //If grounded and trail-time is not up yet
+        if (grounded && trailRenderer.time > 0)
+        {
+            //Gradually decrease trail time once player is grounded
+            trailRenderer.time -= fadeOutSpeed * Time.deltaTime;
+            //If 0 reached
+            if (trailRenderer.time < 0)
+            {
+                //Reset time counter
+                trailRenderer.time = 0;
+                //Disable trail completely
+                trailRenderer.enabled = false; 
+            }
         }
     }
 
@@ -189,6 +224,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (other.CompareTag("Wind"))
         {
             inWind = true;
+
+            //VFX: WIND TRAIL 
+            // Activate trail renderer when in wind
+            if (!trailRenderer.enabled)
+            {
+                //Reset trail time to default (0.5)
+                trailRenderer.time = defaultTrailTime;
+                //Enable/activate trail
+                trailRenderer.enabled = true;
+            }
 
             if (Time.time - lastCollisionTime >= windCollisionCooldown) 
             {
