@@ -319,6 +319,11 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             // Adjust decrease rate based on trigger input
             float triggerValue = context.ReadValue<float>();
             chargeMeterDecreaseRate = Mathf.Lerp(0.2f, 1f, triggerValue);
+
+            //FOR VFX: THRUST CHECKER
+            if (HasFuel()) { 
+            VFXManager.Instance.PlayVFX("boost", transform.position + new Vector3(0, 0.5f, 0));
+            }
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
@@ -351,5 +356,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
         }
+    }
+
+    //FOR VFX:
+    // Method to check if the charge meter has fuel
+    private bool HasFuel()
+    {
+        return chargeMeter.transform.localScale.y > 0;
     }
 }
