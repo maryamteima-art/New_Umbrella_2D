@@ -213,10 +213,15 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         currentSwingSpeed = Mathf.Lerp(2f, 0.5f, triggerDepth); 
         originalPosition = transform.position; 
         originalRotation = transform.rotation; 
+        
+        
     }
 
     void StopSwing()
     {
+        //SoundFX
+        SoundFXManager.instance.PlaySwingClip(transform, 0.5f);
+        
         isSwinging = false;
         Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
         float joystickMagnitude = orientationInput.magnitude;

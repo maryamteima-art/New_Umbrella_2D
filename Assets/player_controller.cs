@@ -342,6 +342,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
+            
+            //SoundFX
+            SoundFXManager.instance.PlayLandClip(transform, 0.5f);
         }
     }
 
@@ -355,6 +358,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
+            
+            
         }
     }
 
