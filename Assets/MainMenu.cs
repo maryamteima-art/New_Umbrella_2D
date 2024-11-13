@@ -5,7 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class MainMenu : MonoBehaviour
 {
-
+    public string scene;
+    public Color loadToColor = Color.white;
 
     public void LoadGame()
     {
@@ -17,7 +18,8 @@ public class MainMenu : MonoBehaviour
         if (Input.anyKeyDown || AnyAnalogButtonPressed())
         {
             // Load the scene
-            LoadGame();
+            // LoadGame();
+            Initiate.Fade(scene, loadToColor, 0.5f);
             //Debug.Log("I EXIST");
         }
     }
