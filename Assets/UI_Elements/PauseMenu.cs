@@ -26,7 +26,7 @@ public class PauseMenu : MonoBehaviour
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton9))
+        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton7))
         {
             Debug.Log("escape");
             if (GamePaused)

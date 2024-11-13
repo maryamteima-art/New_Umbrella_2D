@@ -213,7 +213,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         // Don't push player up if meter empty
         if (chargeMeterDecreaseRate > 0 && newHeight > 0)
         {
-            float forceMagnitude = Mathf.Lerp(0.02f, 0.1f, chargeMeterDecreaseRate);
+            float forceMagnitude = Mathf.Lerp(0.02f, 0.05f, chargeMeterDecreaseRate);
             rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
         }
     }
