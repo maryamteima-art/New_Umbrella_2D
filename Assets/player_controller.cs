@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             //Animator
             robotSpriteRenderer.flipX = false;
             
-            if (Time.time - lastWalk >= walkCooldown) 
+            if ((Time.time - lastWalk >= walkCooldown) && (grounded))
             {
                 //SoundFX
                 SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
@@ -151,7 +151,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             //Animator
             robotSpriteRenderer.flipX = true;
             
-            if (Time.time - lastWalk >= walkCooldown) 
+            if ((Time.time - lastWalk >= walkCooldown) && (grounded))
             {
                 //SoundFX
                 SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
