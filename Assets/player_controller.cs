@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 {
@@ -52,6 +53,11 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public float groundCheckRadius = 0.2f;
     public LayerMask terrainLayer;
 
+    //For player Spawn Tutorial Point 
+    Vector2 startSpawnPOS;
+    public Text countdownText;
+
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -89,6 +95,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             trailRenderer.enabled = false;
         }
+        startSpawnPOS = transform.position;
     }
 
     void Update()
@@ -247,6 +254,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 }
             });
         }
+
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -271,6 +279,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 //SoundFX
                 SoundFXManager.instance.PlayInWindClip(transform, 0.5f);
             }
+        }
+        else if(other.CompareTag("Spawn Start")){
+            ReturnSpawn();
         }
     }
 
@@ -389,5 +400,26 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     private bool HasFuel()
     {
         return chargeMeter.transform.localScale.y > 0;
+    }
+
+    //For Return to Start Spawn Tutorial
+
+
+    void ReturnSpawn()
+    {
+        StartCoroutine(ReturnSpw(1f));
+    }
+    IEnumerator ReturnSpw(float duration)
+    {
+        for (int i = 3; i >= 0; i--)
+        {
+            countdownText.text = i.ToString();//https://discussions.unity.com/t/converting-from-ui-text-to-string-and-back/631312
+            yield return new WaitForSeconds(duration);
+        }
+        transform.position = startSpawnPOS;
+
+        countdownText.text = "3";
+
+
     }
 }

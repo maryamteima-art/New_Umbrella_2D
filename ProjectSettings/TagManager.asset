@@ -8,6 +8,7 @@ TagManager:
   - Umbrella
   - Wind
   - Player Spawn
+  - Spawn Start
   layers:
   - Default
   - TransparentFX
@@ -19,7 +20,7 @@ TagManager:
   - Hazard
   - WindSway_Elements
   - 
-  - 
+  - MenuUI
   - 
   - 
   - 
@@ -44,4 +45,7 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: MenuLayer
+    uniqueID: 2714141359
     locked: 0
