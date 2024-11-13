@@ -19,6 +19,7 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_death;
     [SerializeField] private AudioClip soundFX_Land;
     [SerializeField] private AudioClip soundFX_Swing;
+    [SerializeField] private AudioClip soundFX_Walk;
 
 
 
@@ -181,6 +182,27 @@ public class SoundFXManager : MonoBehaviour
 
         // assign audioclip
         audioSource.clip = soundFX_Swing;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
+    
+    public void PlayWalkClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_Walk;
 
         // vvvolume
         audioSource.volume = volume;

@@ -17,8 +17,11 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public SpriteRenderer robotSpriteRenderer;
     
     // for SoundFX
-    public float windCollisionCooldown = 1f;
+    public float windCollisionCooldown = 2f;
     private float lastCollisionTime = 0f;
+    
+    public float walkCooldown = 0.1f;
+    private float lastWalk = 0f;
 
     private PlayerInputActions inputActions;
     private Vector2 moveInput;
@@ -131,6 +134,15 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             
             //Animator
             robotSpriteRenderer.flipX = false;
+            
+            if (Time.time - lastWalk >= walkCooldown) 
+            {
+                //SoundFX
+                SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
+                
+                lastWalk = Time.time;
+            }
+            
         }
         else if (moveInput.x < 0)
         {
@@ -138,7 +150,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             
             //Animator
             robotSpriteRenderer.flipX = true;
+            
+            if (Time.time - lastWalk >= walkCooldown) 
+            {
+                //SoundFX
+                SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
+                
+                lastWalk = Time.time;
+            }
         }
+        
 
         // Continuously update charge meter if the decrease rate is set
         if (chargeMeterDecreaseRate > 0)
