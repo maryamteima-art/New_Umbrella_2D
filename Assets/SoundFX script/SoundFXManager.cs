@@ -20,6 +20,7 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_Land;
     [SerializeField] private AudioClip soundFX_Swing;
     [SerializeField] private AudioClip soundFX_Walk;
+    [SerializeField] private AudioClip soundFX_hitHazard;
 
 
 
@@ -203,6 +204,27 @@ public class SoundFXManager : MonoBehaviour
 
         // assign audioclip
         audioSource.clip = soundFX_Walk;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public void PlayHitHazardClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_hitHazard;
 
         // vvvolume
         audioSource.volume = volume;

@@ -316,6 +316,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 {
                     playerRb.velocity = Vector2.zero;
                     VFXManager.Instance.PlayVFX("LinesExplosion", transform.position + new Vector3(0, 0.5f, 0));
+
+                    //SoundFX
+                    SoundFXManager.instance.PlayHitHazardClip(transform, 1f);
                 }
                 Vector2 collisionDirection = player.position - transform.position;
                 collisionDirection.Normalize();
