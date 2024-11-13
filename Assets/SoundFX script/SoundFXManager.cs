@@ -17,6 +17,8 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_landWater;
     [SerializeField] private AudioClip soundFX_inWind;
     [SerializeField] private AudioClip soundFX_death;
+    [SerializeField] private AudioClip soundFX_Land;
+    [SerializeField] private AudioClip soundFX_Swing;
 
 
 
@@ -111,6 +113,27 @@ public class SoundFXManager : MonoBehaviour
         // destroy after play
         Destroy(audioSource.gameObject, clipLength);
     }
+    
+    public void PlayLandClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_Land;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
 
     public void PlayInWindClip(Transform spawnTransform, float volume)
     {
@@ -149,5 +172,26 @@ public class SoundFXManager : MonoBehaviour
 
         // destroy after play
         Destroy(audioSource.gameObject, audioSource.clip.length);
+    }
+    
+    public void PlaySwingClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_Swing;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
     }
 }
