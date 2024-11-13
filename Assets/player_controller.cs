@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public float windCollisionCooldown = 2f;
     private float lastCollisionTime = 0f;
     
-    public float walkCooldown = 0.1f;
+    public float walkCooldown = 0.35f;
     private float lastWalk = 0f;
 
     private PlayerInputActions inputActions;
