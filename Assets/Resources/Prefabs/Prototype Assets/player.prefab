@@ -75,7 +75,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.25, y: 1}
+  m_Size: {x: 0.1, y: 1}
   m_EdgeRadius: 0
 --- !u!1 &393166459190496341
 GameObject:
@@ -496,7 +496,10 @@ MonoBehaviour:
   inWind: 0
   grounded: 0
   umbrellaActive: 0
+  robotAnimator: {fileID: 0}
+  robotSpriteRenderer: {fileID: 0}
   windCollisionCooldown: 1
+  walkCooldown: 0.35
   isLaunching: 0
   chargeMeter: {fileID: 1177445914493871216}
   trailRenderer: {fileID: 0}
