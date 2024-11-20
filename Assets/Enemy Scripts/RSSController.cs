@@ -38,7 +38,11 @@ public class RSSController : MonoBehaviour
     //Stores the initial rotation of the object
     private Quaternion initialRotation;
     //Tracks progress for linear motion
-    private float movementProgress = 0f; 
+    private float movementProgress = 0f;
+
+    //Gameplay
+    private bool setupPointsInitialized = false;
+
 
 
     void Start()
@@ -50,8 +54,7 @@ public class RSSController : MonoBehaviour
 
         //Setup visual marker and colliders
         SetupVisualMarker();
-        SetupCollider();
-        SetupInteractionPointColliders();
+        SetupInteractionPoints();
         SetupSprite();
 
         //Find the player and set up references
@@ -71,127 +74,162 @@ public class RSSController : MonoBehaviour
     //Thrust, swing, and timedbuttons use oncollisionenter methods
     void Update()
     {
-        // Continuously update the initial position to reflect object movement
+        //Continuously update the initial position to reflect object movement
         initialPosition = transform.position;
 
-        // Clamp and validate input values
+        //Clamp and validate input values
         rssVariables.activationRadius = Mathf.Clamp(rssVariables.activationRadius, 0, float.MaxValue);
         rssVariables.linearDistance = Mathf.Clamp(rssVariables.linearDistance, 0, float.MaxValue);
         rssVariables.interactablePoints = Mathf.Clamp(rssVariables.interactablePoints, 1, int.MaxValue);
-        rssVariables.interactablePoints = Mathf.RoundToInt(rssVariables.interactablePoints); // Ensure whole numbers
+        //Ensure whole numbers
+        rssVariables.interactablePoints = Mathf.RoundToInt(rssVariables.interactablePoints); 
+
+        //Updating interaction points placement
+        if (!setupPointsInitialized)
+        {
+            SetupInteractionPoints();
+            setupPointsInitialized = true;
+        }
 
         // Only run activation logic if not already activated
         if (!isActivated)
         {
             if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.Proximity)
             {
-                HandleProximityActivation(); // Continuous check for proximity
+                //Continuous check for proximity
+                HandleProximityActivation(); 
             }
         }
         else
         {
-            // Movement logic (linear or rotation) after activation
+            //Movement logic (linear or rotation) after activation
             HandleMovement();
         }
     }
 
     //----------- GENERAL FUNCTIONS OF RSS --------------//
 
-    //Creating Colliders
-    private void SetupCollider()
+    //Setup interaction points and there corresponding colliders
+    //This uses radial dispersion which adds the points on z-plane. Couldn't figure the bug that's making it not be in y-z plane
+    /*private void SetupInteractionPoints()
     {
-        //Clear existing colliders
-        Collider[] existingColliders = GetComponents<Collider>();
-        foreach (var collider in existingColliders)
-        {
-            Destroy(collider);
-        }
-
-        //Add main collider for proximity activation
-        // Proximity doesn't need smaller colliders
-        if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.Proximity)
-        {
-            SphereCollider proximityCollider = gameObject.AddComponent<SphereCollider>();
-            proximityCollider.radius = rssVariables.activationRadius;
-            proximityCollider.isTrigger = true;
-            return; 
-        }
-
-        //Create smaller colliders for interactive points
-        //Default radius if none provided is 0.5
-        for (int i = 0; i < rssVariables.interactablePoints; i++)
-        {
-            float pointRadius = rssVariables.interactionPointRadii != null && i < rssVariables.interactionPointRadii.Count
-                ? rssVariables.interactionPointRadii[i]
-                : 0.5f; 
-
-            //Calculate position of the collider
-            float angle = (i * Mathf.PI * 2) / rssVariables.interactablePoints;
-            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * rssVariables.activationRadius;
-            Vector3 interactionPoint = transform.position + offset;
-
-            //Add a collider at the interaction point
-            Collider collider;
-
-            switch (rssVariables.triggerMechanism)
-            {
-                //Swing gets box collider
-                case RSSVariableContainer.TriggerType.Swing:
-                    collider = gameObject.AddComponent<BoxCollider>();
-                    ((BoxCollider)collider).size = Vector3.one * pointRadius; 
-                    break;
-                //Thrust gets circular collider
-                case RSSVariableContainer.TriggerType.Thrust:
-                case RSSVariableContainer.TriggerType.TimedButtonPress:
-                    collider = gameObject.AddComponent<SphereCollider>();
-                    ((SphereCollider)collider).radius = pointRadius; 
-                    break;
-
-                default:
-                    Debug.LogWarning($"Unhandled trigger mechanism for collider setup: {rssVariables.triggerMechanism}");
-                    continue;
-            }
-
-            collider.isTrigger = true;
-
-            //Move the collider to the calculated position
-            collider.transform.position = interactionPoint;
-        }
-    }
-
-    private void SetupInteractionPointColliders()
-    {
-        //Clear existing child colliders
+        //Clear existing child objects and colliders
         foreach (Transform child in transform)
         {
             Destroy(child.gameObject);
         }
 
-        //Create colliders for each interaction point
+        if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.Proximity)
+        {
+            //Add a single proximity collider (no need for mini sub-interaction points)
+            SphereCollider proximityCollider = gameObject.AddComponent<SphereCollider>();
+            proximityCollider.radius = rssVariables.activationRadius;
+            proximityCollider.isTrigger = true;
+            return;
+        }
+
+        //Create interaction points for other trigger types
         for (int i = 0; i < rssVariables.interactablePoints; i++)
         {
-            float pointRadius = rssVariables.interactionPointRadii != null && i < rssVariables.interactionPointRadii.Count
-                ? rssVariables.interactionPointRadii[i]
-                : 0.5f; // Default radius if none provided
-
-            //Correctly calculate angle per point
+            //Calculate the angle for each interaction point
             float angle = (i * Mathf.PI * 2) / rssVariables.interactablePoints;
 
-            // Offset position based on angle
-            Vector3 offset = new Vector3(Mathf.Cos(angle), 0, Mathf.Sin(angle)) * rssVariables.activationRadius;
+            //Compute the position strictly in the X-Y plane
+            Vector3 offset = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * rssVariables.activationRadius;
 
             //Create a new GameObject for the interaction point
             GameObject point = new GameObject($"InteractionPoint_{i}");
             point.transform.SetParent(transform);
-            point.transform.position = transform.position + offset;
+            point.transform.localPosition = offset;
 
-            //Add a sphere collider to the interaction point
-            SphereCollider collider = point.AddComponent<SphereCollider>();
-            collider.radius = pointRadius;
-            collider.isTrigger = true;
+            //Add collider based on trigger type
+            Collider collider = null;
+            switch (rssVariables.triggerMechanism)
+            {
+                //Swing/attack gets a box collider
+                case RSSVariableContainer.TriggerType.Swing:
+                    collider = point.AddComponent<BoxCollider>();
+                    //Default size is 0.5
+                    ((BoxCollider)collider).size = Vector3.one * 0.5f; 
+                    break;
+                //Thurst and Timed attack gets a Sphere collider
+                case RSSVariableContainer.TriggerType.Thrust:
+                case RSSVariableContainer.TriggerType.TimedButtonPress:
+                    collider = point.AddComponent<SphereCollider>();
+                    //Default radius size is 0.5
+                    ((SphereCollider)collider).radius = 0.5f; 
+                    break;
+            }
 
-            //Add a visual marker for debugging (optional)
-            point.AddComponent<DebugMarker>().SetRadius(pointRadius);
+            if (collider != null)
+            {
+                collider.isTrigger = true;
+            }
+        }
+    }*/
+
+    //Setup interaction points and there corresponding colliders
+    //Uses randomized positions instead of radial dispersion
+    private void SetupInteractionPoints()
+    {
+        //Debugging
+        Debug.Log("Using updated SetupInteractionPoints with random positions.");
+
+        //Clear existing child objects and colliders
+        foreach (Transform child in transform)
+        {
+            Destroy(child.gameObject);
+        }
+
+        if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.Proximity)
+        {
+            //Add a single proximity collider (no need for mini sub-interaction points)
+            SphereCollider proximityCollider = gameObject.AddComponent<SphereCollider>();
+            proximityCollider.radius = rssVariables.activationRadius;
+            proximityCollider.isTrigger = true;
+            return;
+        }
+
+        //Create interaction points with random positions within the radius
+        for (int i = 0; i < rssVariables.interactablePoints; i++)
+        {
+            //Generate a random angle
+            float angle = Random.Range(0, Mathf.PI * 2);
+
+            //Generate a random distance from the center within the radius
+            float distance = Random.Range(0, rssVariables.activationRadius);
+
+            //Calculate position in the X-Y plane
+            Vector3 offset = new Vector3(Mathf.Cos(angle) * distance, Mathf.Sin(angle) * distance, 0);
+
+            //Create a new GameObject for the interaction point
+            GameObject point = new GameObject($"InteractionPoint_{i}");
+            point.transform.SetParent(transform);
+            point.transform.localPosition = offset;
+
+            //Add a collider based on the trigger type
+            Collider collider = null;
+            switch (rssVariables.triggerMechanism)
+            {
+                //Swing/Attack gets box collider
+                case RSSVariableContainer.TriggerType.Swing:
+                    collider = point.AddComponent<BoxCollider>();
+                    //Default size is 0.5 
+                    ((BoxCollider)collider).size = Vector3.one * 0.5f; 
+                    break;
+                //Thrust/Jetpack & TimedButtonPress gets sphere collider
+                case RSSVariableContainer.TriggerType.Thrust:
+                case RSSVariableContainer.TriggerType.TimedButtonPress:
+                    collider = point.AddComponent<SphereCollider>();
+                    //Default size is 0.5
+                    ((SphereCollider)collider).radius = 0.5f; 
+                    break;
+            }
+
+            if (collider != null)
+            {
+                collider.isTrigger = true;
+            }
         }
     }
 
@@ -494,12 +532,15 @@ public class RSSController : MonoBehaviour
         }
 
     }
-    
+
 
     //Unlocking RSS
     private void ActivateRSS()
     {
         isActivated = true;
+
+        //Disable all interactable points and colliders
+        DeactivateInteractionPoints();
 
         //Trigger Visual Animation
         Animator animator = GetComponent<Animator>();
@@ -515,7 +556,7 @@ public class RSSController : MonoBehaviour
             progressText.text = "Activated!";
         }
 
-        //Inform in Debug
+        //Inform in Debug console
         Debug.Log("RSS Activated!");
     }
 
@@ -587,14 +628,14 @@ public class RSSController : MonoBehaviour
 
 
     //----------- PROXIMITY ACTIVATION (Update loop) --------------//
-    
+
     //Handles activation based on proximity
     private void HandleProximityActivation()
     {
-        //Distance calculation using Unity's distance calculator
-        float distance = Vector3.Distance(player.position, transform.position);
+        float distance = Vector2.Distance(
+            new Vector2(player.position.x, player.position.y),
+            new Vector2(transform.position.x, transform.position.y));
 
-        //Check if player is within the activation radius
         if (distance <= rssVariables.activationRadius && !isActivated)
         {
             ActivateRSS();
@@ -603,32 +644,42 @@ public class RSSController : MonoBehaviour
         UpdateVisualMarker();
     }
 
-    //----------- COLLISIONS WITH INTERACTION POINTS (Thrust, Swing, TimedButtonPress) -------------//
-
+    //Check for success and trigger ActivateRSS
     private void OnTriggerEnter(Collider other)
     {
-        if (isActivated) return; // Ignore interactions if already activated
+        if (isActivated) return;
+
+        //Ensure interaction happens only on the x-y plane
+        if (Mathf.Abs(player.position.z - transform.position.z) > 0.1f)
+        {
+            //Ignore triggers not in the 2D plane
+            return; 
+        }
 
         switch (rssVariables.triggerMechanism)
         {
             case RSSVariableContainer.TriggerType.Swing:
+                //Incmrement new hits
                 swingCounter++;
+                //If the interactable point has been hit X amount of times, activate RSS 
                 if (swingCounter >= rssVariables.interactablePoints)
                 {
                     ActivateRSS();
                 }
                 break;
-
+            //if thrust meter limit reached, activate the system
             case RSSVariableContainer.TriggerType.Thrust:
-                thrustMeter += Time.deltaTime; // Increment thrust meter
+                //Incmrement pressure gauge
+                thrustMeter += Time.deltaTime;
                 if (thrustMeter >= rssVariables.thrustActivationThreshold)
                 {
                     ActivateRSS();
                 }
                 break;
-
+            //If timedButton has been presed for X duration, activate the system
             case RSSVariableContainer.TriggerType.TimedButtonPress:
-                holdDuration += Time.deltaTime; // Increment hold duration
+                //Incmrement hold-time
+                holdDuration += Time.deltaTime;
                 if (holdDuration >= rssVariables.timerDuration)
                 {
                     ActivateRSS();
@@ -637,19 +688,48 @@ public class RSSController : MonoBehaviour
         }
     }
 
+    //Reset states when player leaves collider bounds (only occurs when they've left mid action)
     private void OnTriggerExit(Collider other)
     {
+        //If the interactable points have been activated, skip this function entirely 
         if (isActivated) return;
 
-        // Reset state when player leaves collider bounds
-        if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.Thrust)
+        //Reset state when player leaves collider bounds mid-action
+        switch (rssVariables.triggerMechanism)
         {
-            thrustMeter = Mathf.Max(0, thrustMeter - Time.deltaTime);
+            //Thrust meter decrements until it reaches 0
+            case RSSVariableContainer.TriggerType.Thrust:
+                thrustMeter = Mathf.Max(0, thrustMeter - Time.deltaTime);
+                break;
+            //Loading bar decrements until it reaches 0
+            case RSSVariableContainer.TriggerType.TimedButtonPress:
+                holdDuration = Mathf.Max(0, holdDuration - Time.deltaTime);
+                break;
+            //Swing hits decrement, until it reaches 0
+            case RSSVariableContainer.TriggerType.Swing:
+                swingCounter = Mathf.Max(0, swingCounter - 1); 
+                break;
         }
-        else if (rssVariables.triggerMechanism == RSSVariableContainer.TriggerType.TimedButtonPress)
+    }
+
+    //Deactivation (once interactable points have been successfully unlocked, they get deleted)
+    private void DeactivateInteractionPoints()
+    {
+        foreach (Transform child in transform)
         {
-            holdDuration = Mathf.Max(0, holdDuration - Time.deltaTime);
+            Collider collider = child.GetComponent<Collider>();
+            if (collider != null)
+            {
+                //Disable collider
+                collider.enabled = false; 
+            }
+
+            //Destroy the child GameObject
+            Destroy(child.gameObject); 
         }
+
+        //Update Debugger
+        Debug.Log("All interaction points deactivated.");
     }
 
 }

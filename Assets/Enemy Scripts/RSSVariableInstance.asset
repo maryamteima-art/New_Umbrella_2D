@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 251e5d5d852f4ac4c9098c2d15ba8bbc, type: 3}
   m_Name: RSSVariableInstance
   m_EditorClassIdentifier: 
-  triggerMechanism: 1
-  activationRadius: 5.25
-  interactablePoints: 3
+  triggerMechanism: 2
+  activationRadius: 4.73
+  interactablePoints: 5
+  interactionPointRadii: []
   timedPressKey: 101
   pathOption: 0
   thrustActivationThreshold: 3
@@ -25,9 +26,9 @@ MonoBehaviour:
   rotationAxis: {x: 0, y: 1, z: 0}
   isRotationalForever: 0
   linearDirection: {x: 2.21, y: 0, z: 0}
-  linearDistance: 17.21
+  linearDistance: 4.2
   linearSpeed: 5.86
   isLinearOscillating: 1
-  proximityColor: {r: 0, g: 0, b: 1, a: 1}
   activeColor: {r: 0, g: 0.28757596, b: 1, a: 1}
   resetColor: {r: 1, g: 0, b: 0, a: 1}
+  proximityColor: {r: 0, g: 0, b: 1, a: 1}

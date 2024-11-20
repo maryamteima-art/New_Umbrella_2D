@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 [CreateAssetMenu(fileName = "RSSVariables", menuName = "RSS/VariableContainer", order = 1)]
 public class RSSVariableContainer : ScriptableObject
