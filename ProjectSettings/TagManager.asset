@@ -8,6 +8,7 @@ TagManager:
   - Umbrella
   - Wind
   - Player Spawn
+  - Kill Wall
   layers:
   - Default
   - TransparentFX
