@@ -36,4 +36,5 @@ public class PlayerSpawnController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(transform.position, 0.5f);
     }
+
 }
