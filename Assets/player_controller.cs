@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public float groundCheckRadius = 0.2f;
     public LayerMask terrainLayer;
 
+    public bool hasBubble = false; // Indicates if player has a bubble
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -213,8 +215,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         // Don't push player up if meter empty
         if (chargeMeterDecreaseRate > 0 && newHeight > 0)
         {
-            float forceMagnitude = Mathf.Lerp(0.02f, 0.05f, chargeMeterDecreaseRate);
-            rb.AddForce(Vector2.up * forceMagnitude, ForceMode2D.Impulse);
+            float forceMagnitude = Mathf.Lerp(100f, 1000f, chargeMeterDecreaseRate);
+            rb.AddForce(Vector2.up * forceMagnitude * Time.deltaTime, ForceMode2D.Force);
         }
     }
 
@@ -223,29 +225,34 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         // Check if player touches a hazard
         if (collision.gameObject.layer == LayerMask.NameToLayer("Hazard"))
         {
-            SoundFXManager.instance.PlayDeathClip(transform, 0.5f);
-            HitStop(250, () => {
-                // Find the spawner closest to the left of the player
-                GameObject[] spawners = GameObject.FindGameObjectsWithTag("Player Spawn");
-                GameObject closestSpawner = null;
-                float playerX = transform.position.x;
-                float closestX = float.MinValue;
+            if (!hasBubble) {
+                SoundFXManager.instance.PlayDeathClip(transform, 0.5f);
+                HitStop(250, () => {
+                    // Find the spawner closest to the left of the player
+                    GameObject[] spawners = GameObject.FindGameObjectsWithTag("Player Spawn");
+                    GameObject closestSpawner = null;
+                    float playerX = transform.position.x;
+                    float closestX = float.MinValue;
 
-                foreach (GameObject spawner in spawners)
-                {
-                    float spawnerX = spawner.transform.position.x;
-                    if (spawnerX < playerX && spawnerX > closestX)
+                    foreach (GameObject spawner in spawners)
                     {
-                        closestX = spawnerX;
-                        closestSpawner = spawner;
+                        float spawnerX = spawner.transform.position.x;
+                        if (spawnerX < playerX && spawnerX > closestX)
+                        {
+                            closestX = spawnerX;
+                            closestSpawner = spawner;
+                        }
                     }
-                }
 
-                if (closestSpawner != null)
-                {
-                    transform.position = closestSpawner.transform.position;
-                }
-            });
+                    if (closestSpawner != null)
+                    {
+                        transform.position = closestSpawner.transform.position;
+                    }
+                });
+            }
+            else {
+                hasBubble = false;
+            }
         }
     }
 
