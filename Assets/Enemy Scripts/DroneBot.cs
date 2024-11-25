@@ -36,6 +36,8 @@ public class DroneBot : MonoBehaviour
     [Header("Explosion Settings")]
     [Tooltip("Radius of the explosion effect.")]
     [Range(0.5f, 200f)] public float explosionRadius = 3f;
+    [Tooltip("Time before the bot explodes after being triggered.")]
+    [SerializeField] public float totalTimeToExplode = 5f;
 
 
     /// <summary>
@@ -49,7 +51,7 @@ public class DroneBot : MonoBehaviour
     private float deflectionForce;
 
     //----- Internal Variables -------
-    
+
     //Initial position of the bot
     private Vector3 startPosition;
     //Timer for radial movement
@@ -60,7 +62,10 @@ public class DroneBot : MonoBehaviour
     private bool isTriggered = false;
     //Deflection (swing/attack or open umbrella). Needs reference and rigidbody for angle calculations (for bounce-back/rebound)
     private UmbrellaController umbrellaController;
+    //enemy rigidbody
     private Rigidbody2D rb;
+    //playerrb
+    private Rigidbody2D playerRb;
 
     //Movement pattern & explosion behaviour
     public enum MovementPattern {Vertical, Linear, Radial}
@@ -73,7 +78,13 @@ public class DroneBot : MonoBehaviour
 
     public enum DeflectionMode {ForceIncreasesNearExplosion, ForceDecreasesNearExplosion}
     //Tracks time since detection
-    private float timeSinceTrigger = 0f; 
+    private float timeSinceTrigger = 0f;
+    //Dynamically calculated based on the remaining time
+    private float deflectionForce;
+    [Tooltip("Multiplier applied to the calculated deflection force for added control.")]
+    [Range(0.1f, 10f)] public float deflectionForceMultiplier = 1f;
+    [Tooltip("Multiplier applied to the player's knockback force for fine-tuning.")]
+    [Range(0.1f, 10f)] public float playerForceMultiplier = 1.5f;
 
 
 
@@ -96,31 +107,66 @@ public class DroneBot : MonoBehaviour
             Debug.LogError("UmbrellaController not found on the player!");
         }
 
-        rb = GetComponent<Rigidbody2D>();
+        
+        //Create rigidbody for enemy if none is provided 
+        rb = gameObject.GetComponent<Rigidbody2D>();
         if (rb == null)
         {
-            Debug.LogError("Rigidbody2D not found on DroneBot!");
+            rb = gameObject.AddComponent<Rigidbody2D>();
+            //Disable gravity for 2D bots
+            rb.gravityScale = 0; 
         }
+
+        //Add or find CircleCollider2D and match it to sprite size
+        CircleCollider2D collider = gameObject.GetComponent<CircleCollider2D>();
+        if (collider == null)
+        {
+            collider = gameObject.AddComponent<CircleCollider2D>();
+        }
+
+        //Match collider size to the sprite
+        SpriteRenderer spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
+        if (spriteRenderer != null)
+        {
+            //Radius = half the sprite's width
+            collider.radius = spriteRenderer.bounds.size.x / 2f; 
+        }
+
+
+        playerRb = player?.GetComponent<Rigidbody2D>();
+        if (playerRb == null) Debug.LogError("Player does not have Rigidbody2D!");
     }
 
 
     void Update()
     {
-        //Detects time since trigger to perform launch
         if (isTriggered)
         {
             timeSinceTrigger += Time.deltaTime;
 
-            // Ensure the bot explodes if the timer runs out
-            if (timeSinceTrigger >= totalTimeToExplode)
+            //Behavior depends on the detection type chosen by level designer
+            if (detectionType == DetectionType.ExplodeOnDetection)
             {
-                Explode();
+                //Explode after the configured total timer
+                if (timeSinceTrigger >= totalTimeToExplode)
+                {
+                    Explode();
+                }
             }
-            return;
+            else if (detectionType == DetectionType.FollowAndExplode)
+            {
+                //Explode after the follow duration ends
+                if (timeSinceTrigger >= followDuration)
+                {
+                    Explode();
+                }
+            }
         }
-
-        Patrol();
-        DetectPlayer();
+        else
+        {
+            Patrol();
+            DetectPlayer();
+        }
     }
 
     //-------------------- PATROL MOVEMENT FUNCTIONS --------------------//
@@ -162,7 +208,7 @@ public class DroneBot : MonoBehaviour
 
             if (detectionType == DetectionType.ExplodeOnDetection)
             {
-                Explode();
+                StartCoroutine(HandleExplosionTimer(totalTimeToExplode));
             }
             else if (detectionType == DetectionType.FollowAndExplode)
             {
@@ -170,6 +216,14 @@ public class DroneBot : MonoBehaviour
             }
         }
     }
+    //For ExplodeOnDetection
+    //Plays timer before exploding. timer is configurable by level designer
+    private IEnumerator HandleExplosionTimer(float duration)
+    {
+        yield return new WaitForSeconds(duration);
+        if (isTriggered) Explode();
+    }
+
 
     //-------------------- DEFLECTION METHODS --------------------//
 
@@ -177,9 +231,11 @@ public class DroneBot : MonoBehaviour
     //Same direction but upwards, so it launches in opposite direction 
     private void OnCollisionEnter2D(Collision2D collision)
     {
+        //Trigger deflection logic for collisions with the player
         if (collision.collider.CompareTag("Player"))
         {
-            HandleDeflection(collision);
+            //Handle deflection each time a collision occurs
+            HandleDeflection(collision); 
         }
     }
 
@@ -187,16 +243,58 @@ public class DroneBot : MonoBehaviour
     //OnCollision is locked/protected (can't be accessed)
     private void HandleDeflection(Collision2D collision)
     {
-        //Check if umbrella is open or player is swinging
+        //Variables to store deflection direction for the bot and knockback direction for the player
+        Vector2 botDeflectionDirection;
+        Vector2 playerKnockbackDirection;
+
+        //Determine deflection behavior when the umbrella is open
         if (umbrellaController != null && umbrellaController.umbrellaOpen)
         {
+            //Calculate umbrella deflection direction
             Vector2 umbrellaDirection = GetUmbrellaDeflectionDirection();
-            DeflectBot(umbrellaDirection);
+            //Bot gets deflected opposite to the umbrella's direction
+            botDeflectionDirection = -umbrellaDirection;
+            //Player gets knocked back in the same direction as the umbrella
+            playerKnockbackDirection = umbrellaDirection;
         }
         else if (umbrellaController != null && umbrellaController.isSwinging)
         {
-            Vector2 swingDirection = (collision.transform.position - transform.position).normalized;
-            DeflectBot(swingDirection);
+            //Bot moves away from collision
+            botDeflectionDirection = (collision.transform.position - transform.position).normalized;
+            //Player moves opposite to the bot
+            playerKnockbackDirection = (transform.position - collision.transform.position).normalized;
+        }
+        else
+        {
+            //If no umbrella action is detected, exit this knockback function
+            return;
+        }
+
+        //Calculate the remaining time for the bot before explosion
+        float remainingTime = totalTimeToExplode - timeSinceTrigger;
+
+        //Adjust deflection force based on the selected deflection mode and configurable multipliers (for bot it's deflectionForceMultiplier, for player it's playerForceMultiplier) 
+        if (deflectionMode == DeflectionMode.ForceIncreasesNearExplosion)
+        {
+            deflectionForce = Mathf.Lerp(5f, 20f, 1 - (remainingTime / totalTimeToExplode)) * deflectionForceMultiplier;
+        }
+        else
+        {
+            deflectionForce = Mathf.Lerp(20f, 5f, 1 - (remainingTime / totalTimeToExplode)) * playerForceMultiplier;
+        }
+
+        //Scale the force applied to the player to ensure proportional knockback
+        float botMass = rb.mass > 0 ? rb.mass:1f;
+        float playerMass = playerRb != null && playerRb.mass > 0 ? playerRb.mass:1f;
+
+        //Apply calculated deflection force to the bot
+        rb.AddForce(botDeflectionDirection * deflectionForce, ForceMode2D.Impulse);
+
+        // Apply knockback force to the player with proportional scaling
+        if (playerRb != null)
+        {
+            float adjustedForce = deflectionForce * playerForceMultiplier * (botMass / playerMass);
+            playerRb.AddForce(playerKnockbackDirection * adjustedForce, ForceMode2D.Impulse);
         }
     }
 
@@ -266,24 +364,28 @@ public class DroneBot : MonoBehaviour
 
         while (followTime < followDuration)
         {
+            //Move towards the player
             transform.position = Vector3.MoveTowards(transform.position, player.position, followSpeed * Time.deltaTime);
 
+            //Immediate explosion on collision
             if (Vector3.Distance(transform.position, player.position) <= 0.1f)
             {
                 RespawnPlayer();
-                //Destroy the bot after respawning the player
-                Destroy(gameObject); 
+                Destroy(gameObject);
                 yield break;
             }
 
             followTime += Time.deltaTime;
+            //Increment the timer for consistency
+            timeSinceTrigger += Time.deltaTime; 
             yield return null;
         }
-        //Call Explode() if follow duration completes without contact
-        Explode(); 
+
+        // Explode when the follow duration ends
+        Explode();
     }
 
-    //-------------------- RESPAWN POINT AAND OTHER GAME-WORLD FUNCTIONS --------------------//
+    //-------------------- RESPAWN POINT AND OTHER GAME-WORLD FUNCTIONS --------------------//
     //Finds the closest respawn point using the Player Spawn tag
     void RespawnPlayer()
     {
