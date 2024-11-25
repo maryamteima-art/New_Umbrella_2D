@@ -304,11 +304,18 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     private IEnumerator HitStopCoroutine(float milliseconds, System.Action onComplete)
     {
         float originalTimeScale = Time.timeScale;
-        // Freeze game
-        Time.timeScale = 0f;
-        StartCoroutine(ScreenShakeCoroutine(milliseconds / 1000f));
-        yield return new WaitForSecondsRealtime(milliseconds / 1000f);
-        Time.timeScale = originalTimeScale;
+        try
+        {
+            // Freeze game
+            Time.timeScale = 0f;
+            StartCoroutine(ScreenShakeCoroutine(milliseconds / 1000f));
+            yield return new WaitForSecondsRealtime(milliseconds / 1000f);
+        }
+        finally
+        {
+            // Ensure time reset
+            Time.timeScale = originalTimeScale;
+        }
         // Execute callback
         onComplete?.Invoke();
     }
