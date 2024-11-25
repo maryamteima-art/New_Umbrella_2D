@@ -21,6 +21,10 @@ public class DroneBot : MonoBehaviour
     [Tooltip("Distance the bot detects the player.")]
     [Range(0.5f, 300f)] public float detectionRange = 5f;
 
+    [Header("Deflection Settings")]
+    [Tooltip("ForceIncreasesNearExplosion: More force near end as robot is about to explode. ForceDecreasesNearExplosion: More force the earlier you hit the bot")]
+    public DeflectionMode deflectionMode = DeflectionMode.ForceIncreasesNearExplosion;
+
     [Tooltip("Determines whether the bot explodes immediately or follows player before exploding.")]
     public DetectionType detectionType = DetectionType.ExplodeOnDetection;
 
@@ -42,37 +46,75 @@ public class DroneBot : MonoBehaviour
     //Reference to the player object
     private Transform player;
     //Trigger for whether the bot has detected the player
-    private bool isTriggered = false; 
+    private bool isTriggered = false;
+    //Deflection (swing/attack or open umbrella). Needs reference and rigidbody for angle calculations (for bounce-back/rebound)
+    private UmbrellaController umbrellaController;
+    private Rigidbody2D rb;
 
+    //Movement pattern & explosion behaviour
     public enum MovementPattern {Vertical, Linear, Radial}
     public enum DetectionType {ExplodeOnDetection, FollowAndExplode}
+
+    //Deflection/Launch behaviour
+    //There's two since when user testing, I want the desigenr to simply toggle between the two options
+    //ForceIncreasesNearExplosion: More force closer to explosion --> Players feel a sense of urgency to hit the bot before it explodes & Deflection force rewards precision under pressure.
+    //ForceDecreasesNearExplosion: More force earlier --> Encourages players to act quickly and rewards faster reflexes & Punishes hesitation, which can add challenge.
+
+    public enum DeflectionMode {ForceIncreasesNearExplosion, ForceDecreasesNearExplosion}
+    //Tracks time since detection
+    private float timeSinceTrigger = 0f; 
+
+
 
 
     void Start()
     {
-        //Cache the initial position of the bot
+        //Cache initial position
         startPosition = transform.position;
 
-        //Find the player by tag
+        //Find player and umbrella controller
         player = GameObject.FindGameObjectWithTag("Player")?.transform;
         if (player == null)
         {
             Debug.LogError("Player object not found! Ensure the player has the 'Player' tag.");
+        }
+
+        umbrellaController = player?.GetComponentInChildren<UmbrellaController>();
+        if (umbrellaController == null)
+        {
+            Debug.LogError("UmbrellaController not found on the player!");
+        }
+
+        rb = GetComponent<Rigidbody2D>();
+        if (rb == null)
+        {
+            Debug.LogError("Rigidbody2D not found on DroneBot!");
         }
     }
 
 
     void Update()
     {
-        //If the bot has been triggered, no further actions needed
-        if (isTriggered) return;
+        //Detects time since trigger to perform launch
+        if (isTriggered)
+        {
+            timeSinceTrigger += Time.deltaTime;
 
-        Patrol(); 
+            // Ensure the bot explodes if the timer runs out
+            if (timeSinceTrigger >= totalTimeToExplode)
+            {
+                Explode();
+            }
+            return;
+        }
+
+        Patrol();
         DetectPlayer();
     }
 
-    //-------------------- PATROL MOVEMENT --------------------//
-    // Handles the bot's movement based on the selected movement pattern by level designer
+    //-------------------- PATROL MOVEMENT FUNCTIONS --------------------//
+    
+    //Handles the bot's movement based on the selected movement pattern by level designer
     void Patrol()
     {
         Vector3 hoverOffset = Vector3.up;
@@ -98,7 +140,6 @@ public class DroneBot : MonoBehaviour
         }
     }
 
-    //-------------------- PLAYER DETECTION --------------------//
     //Detects the player within the bot's detection range and triggers correspinding explosion behavior specified by the level designer.
     void DetectPlayer()
     {
@@ -119,8 +160,73 @@ public class DroneBot : MonoBehaviour
         }
     }
 
-    //-------------------- IMMEDIATE EXPLOSION --------------------//
-    //Causes the bot to explode in place immediately, affecting nearby objects within the explosion radius.
+    //-------------------- DEFLECTION METHODS --------------------//
+
+    //Bounce-back launch which occurs opposite of the open umbrella's direction
+    //Same direction but upwards, so it launches in opposite direction 
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.CompareTag("Player"))
+        {
+            HandleDeflection(collision);
+        }
+    }
+
+    //Function is seperate because if I want to make it public and accessible by other scripts for the same behaviours I can
+    //OnCollision is locked/protected (can't be accessed)
+    private void HandleDeflection(Collision2D collision)
+    {
+        //Check if umbrella is open or player is swinging
+        if (umbrellaController != null && umbrellaController.umbrellaOpen)
+        {
+            Vector2 umbrellaDirection = GetUmbrellaDeflectionDirection();
+            DeflectBot(umbrellaDirection);
+        }
+        else if (umbrellaController != null && umbrellaController.isSwinging)
+        {
+            Vector2 swingDirection = (collision.transform.position - transform.position).normalized;
+            DeflectBot(swingDirection);
+        }
+    }
+
+    //Obtains angle to do the launch
+    private Vector2 GetUmbrellaDeflectionDirection()
+    {
+        //Calculate direction based on umbrella's angle
+        float angleRad = umbrellaController.umbrellaAngle * Mathf.Deg2Rad;
+        return new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+    }
+
+    //Deflection Behaviour depending on teh option the level designer chooses
+    private void DeflectBot(Vector2 deflectionDirection)
+    {
+        //Calculate remaining time
+        float remainingTime = totalTimeToExplode - timeSinceTrigger;
+
+        // djust deflection force based on the selected mode
+        if (deflectionMode == DeflectionMode.ForceIncreasesNearExplosion)
+        {
+            deflectionForce = Mathf.Lerp(5f, 20f, 1 - (remainingTime/totalTimeToExplode));
+        }
+        else if (deflectionMode == DeflectionMode.ForceDecreasesNearExplosion)
+        {
+            deflectionForce = Mathf.Lerp(20f, 5f, 1 - (remainingTime/totalTimeToExplode));
+        }
+
+        //Apply deflection force
+        rb.AddForce(deflectionDirection * deflectionForce, ForceMode2D.Impulse);
+
+        //Destroy the bot after deflection
+        Destroy(gameObject, 0.5f);
+
+        //PLAY VFX:
+
+        //PLAY SOUND:
+    }
+
+    //-------------------- EXPLOSION BEHAVIOURS --------------------//
+
+    //Immediate Explosion: Causes the bot to explode in place immediately, affecting nearby objects within the explosion radius.
     void Explode()
     {
         Debug.Log("Bot is exploding!");
@@ -141,8 +247,8 @@ public class DroneBot : MonoBehaviour
         Destroy(gameObject);
     }
 
-    //-------------------- FOLLOW AND EXPLODE --------------------//
-    // Follows the player for a set duration before exploding.
+
+    //FollowAndExplode: Follows the player for a set duration before exploding.
     IEnumerator FollowAndExplode()
     {
         float followTime = 0f;
@@ -166,7 +272,7 @@ public class DroneBot : MonoBehaviour
         Explode(); 
     }
 
-    //-------------------- FIND CLOSEST RESPAWN POINT --------------------//
+    //-------------------- RESPAWN POINT AAND OTHER GAME-WORLD FUNCTIONS --------------------//
     //Finds the closest respawn point using the Player Spawn tag
     void RespawnPlayer()
     {
@@ -198,6 +304,8 @@ public class DroneBot : MonoBehaviour
             player.position = closestRespawn.transform.position;
         }
     }
+
+    
 
     //-------------------- UI & VISUAL FUNCTIONS --------------------//
     //Visualizing the bot's variables for debugging (color, shape-visual & label)
