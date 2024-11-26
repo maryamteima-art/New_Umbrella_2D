@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class DroneBot : MonoBehaviour
 {
+    //-------- Flexible Variables -----------
     [Header("Respawn Settings")]
     [Tooltip("Tag used to identify respawn points in the scene.")]
     [SerializeField] private string respawnTag = "Player Spawn"; 
@@ -60,11 +61,11 @@ public class DroneBot : MonoBehaviour
     public enum MovementPattern {Vertical, Linear, Radial}
     public enum DetectionType {ExplodeOnDetection, FollowAndExplode}
 
-    //Deflection/Launch behaviour
+    //----- Deflection/Launch behaviour -------
+
     //There's two since when user testing, I want the desigenr to simply toggle between the two options
     //ForceIncreasesNearExplosion: More force closer to explosion --> Players feel a sense of urgency to hit the bot before it explodes & Deflection force rewards precision under pressure.
     //ForceDecreasesNearExplosion: More force earlier --> Encourages players to act quickly and rewards faster reflexes & Punishes hesitation, which can add challenge.
-
     public enum DeflectionMode {ForceIncreasesNearExplosion, ForceDecreasesNearExplosion}
     //Tracks time since detection
     private float timeSinceTrigger = 0f;
@@ -74,6 +75,24 @@ public class DroneBot : MonoBehaviour
     [Range(0.1f, 10f)] public float deflectionForceMultiplier = 1f;
     [Tooltip("Multiplier applied to the player's knockback force for fine-tuning.")]
     [Range(0.1f, 10f)] public float playerForceMultiplier = 1.5f;
+
+    //-------- VFX Variables -----------
+
+    //Internal variables for VFX
+    private GameObject detectionRadiusVFX;
+    private GameObject explosionRadiusVFX;
+    private Transform detectionRadiusTransform;
+    private Transform explosionRadiusTransform;
+    private Material vfxMaterial; // Shared material dynamically created
+
+    // VFX parameters
+    private float pulseSpeed = 2f; // Speed of pulsing effect
+    private float pulseFactor;    // Pulsing factor for scaling
+    private Color explosionColor; // Color of explosion VFX
+    // Gradient for explosion radius color
+    private Gradient explosionGradient;
+    // Reference to a material from the assets folder
+    private Material cloudMaterial; 
 
 
 
@@ -124,6 +143,41 @@ public class DroneBot : MonoBehaviour
 
         playerRb = player?.GetComponent<Rigidbody2D>();
         if (playerRb == null) Debug.LogError("Player does not have Rigidbody2D!");
+
+        //VFX setup
+        //Create the shared material dynamically
+        vfxMaterial = new Material(Shader.Find("Unlit/Color"))
+        {
+            //Semi-transparent red
+            color = new Color(1f, 0f, 0f, 0.5f) 
+        };
+
+        //Load material from Resources folder
+        cloudMaterial = Resources.Load<Material>("VFX Materials/ScratchGrain");
+        if (cloudMaterial == null)
+        {
+            Debug.LogError("Could not find cloudMaterial in Resources!");
+        }
+        else
+        {
+            Debug.Log($"Loaded cloudMaterial: {cloudMaterial.name}");
+        }
+
+        //Create detection radius VFX
+        detectionRadiusVFX = CreatePulsingSphere("Detection Radius", detectionRange, new Color(1f, 0.3f, 0.3f, 0.3f));
+        detectionRadiusTransform = detectionRadiusVFX != null ? detectionRadiusVFX.transform : null;
+
+        //Debug
+        if (detectionRadiusVFX == null) Debug.LogError("Failed to create Detection Radius VFX!");
+
+        //Create explosion radius VFX (initially hidden)
+        explosionRadiusVFX = CreatePulsingSphere("Explosion Radius", explosionRadius, new Color(1f, 0f, 0f, 0.3f));
+        explosionRadiusTransform = explosionRadiusVFX != null ? explosionRadiusVFX.transform : null;
+        
+        //Debug
+        if (explosionRadiusVFX == null) Debug.LogError("Failed to create Explosion Radius VFX!");
+        else explosionRadiusVFX.SetActive(false);
+
     }
 
 
@@ -156,6 +210,9 @@ public class DroneBot : MonoBehaviour
             Patrol();
             DetectPlayer();
         }
+
+        //VFX pulsing
+        UpdateVFX();
     }
 
     //-------------------- PATROL MOVEMENT FUNCTIONS --------------------//
@@ -265,11 +322,11 @@ public class DroneBot : MonoBehaviour
         //Adjust deflection force based on the selected deflection mode and configurable multipliers (for bot it's deflectionForceMultiplier, for player it's playerForceMultiplier) 
         if (deflectionMode == DeflectionMode.ForceIncreasesNearExplosion)
         {
-            deflectionForce = Mathf.Lerp(5f, 20f, 1 - (remainingTime / totalTimeToExplode)) * deflectionForceMultiplier;
+            deflectionForce = Mathf.Lerp(5f, 20f, 1 - (remainingTime/totalTimeToExplode)) * deflectionForceMultiplier;
         }
         else
         {
-            deflectionForce = Mathf.Lerp(20f, 5f, 1 - (remainingTime / totalTimeToExplode)) * playerForceMultiplier;
+            deflectionForce = Mathf.Lerp(20f, 5f, 1 - (remainingTime/totalTimeToExplode)) * playerForceMultiplier;
         }
 
         //Scale the force applied to the player to ensure proportional knockback
@@ -285,6 +342,10 @@ public class DroneBot : MonoBehaviour
             float adjustedForce = deflectionForce * playerForceMultiplier * (botMass / playerMass);
             playerRb.AddForce(playerKnockbackDirection * adjustedForce, ForceMode2D.Impulse);
         }
+
+        //PLAY VFX
+        VFXManager.Instance.PlayVFX("Knockback", transform.position + new Vector3(0, 0.5f, 0));
+        //PLAY SFX
     }
 
     //Obtains angle to do the launch
@@ -295,32 +356,6 @@ public class DroneBot : MonoBehaviour
         return new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
     }
 
-    //Deflection Behaviour depending on teh option the level designer chooses
-    private void DeflectBot(Vector2 deflectionDirection)
-    {
-        //Calculate remaining time
-        float remainingTime = totalTimeToExplode - timeSinceTrigger;
-
-        // djust deflection force based on the selected mode
-        if (deflectionMode == DeflectionMode.ForceIncreasesNearExplosion)
-        {
-            deflectionForce = Mathf.Lerp(5f, 20f, 1 - (remainingTime/totalTimeToExplode));
-        }
-        else if (deflectionMode == DeflectionMode.ForceDecreasesNearExplosion)
-        {
-            deflectionForce = Mathf.Lerp(20f, 5f, 1 - (remainingTime/totalTimeToExplode));
-        }
-
-        //Apply deflection force
-        rb.AddForce(deflectionDirection * deflectionForce, ForceMode2D.Impulse);
-
-        //Destroy the bot after deflection
-        Destroy(gameObject, 0.5f);
-
-        //PLAY VFX:
-
-        //PLAY SOUND:
-    }
 
     //-------------------- EXPLOSION BEHAVIOURS --------------------//
 
@@ -343,6 +378,9 @@ public class DroneBot : MonoBehaviour
 
         //Destroy the bot's GameObject 
         Destroy(gameObject);
+
+        //PLAY VFX
+        VFXManager.Instance.PlayVFX("MechBoom", transform.position + new Vector3(0, 0.5f, 0));
     }
 
 
@@ -370,7 +408,7 @@ public class DroneBot : MonoBehaviour
             yield return null;
         }
 
-        // Explode when the follow duration ends
+        //Explode when the follow duration ends
         Explode();
     }
 
@@ -409,7 +447,103 @@ public class DroneBot : MonoBehaviour
 
     
 
-    //-------------------- UI & VISUAL FUNCTIONS --------------------//
+    //-------------------- VISUAL EFFECTS FUNCTIONS --------------------//
+    
+    //Creates the pulsing animation for detection radius and explosion radius
+    private GameObject CreatePulsingSphere(string name, float radius, Color initialColor)
+    {
+        //Create the GameObject
+        GameObject sphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        sphere.name = name;
+        sphere.transform.SetParent(transform, false);
+        sphere.transform.localPosition = Vector3.zero;
+        sphere.transform.localScale = new Vector3(radius, radius, radius);
+
+        //Remove the collider (visual only)
+        Destroy(sphere.GetComponent<Collider>());
+
+        //Assign the material directly
+        Renderer renderer = sphere.GetComponent<Renderer>();
+        if (cloudMaterial != null)
+        {
+            //Use shared material
+            renderer.material = cloudMaterial;
+            //Apply the initial color
+            cloudMaterial.color = initialColor; 
+        }
+        else
+        {
+            Debug.LogError("cloudMaterial is null! Using default material.");
+            //Backup material if all fails
+            renderer.material = new Material(Shader.Find("Standard")); 
+        }
+
+        return sphere;
+    }
+
+
+    //Looked clunky in update (overwhelming), so this is a dedicated update strcictly for vfx for cleaner readability
+    private void UpdateVFX()
+    {
+        //Map the time to the corresponding variable (ExplodeOnDetection uses totalTimeToExplode; FollowAndExplode uses followDuration)
+        float maxTime = detectionType == DetectionType.ExplodeOnDetection ? totalTimeToExplode : followDuration;
+        float remainingTime = maxTime - timeSinceTrigger;
+
+        //Perform smooth pulse for detection radius
+        if (!isTriggered && detectionRadiusTransform != null)
+        {
+            pulseFactor = Mathf.PingPong(Time.time * pulseSpeed, 1f) * 0.5f + 0.5f;
+            float detectionScale = detectionRange * pulseFactor;
+            detectionRadiusTransform.localScale = new Vector3(detectionScale, detectionScale, 1f);
+
+            //Adjust the detection radius material color (more towards red)
+            if (cloudMaterial != null)
+            {
+                Color lighterBlue = new Color(0.6f, 0.8f, 1f, Mathf.Lerp(0.1f, 0.5f, pulseFactor));
+                cloudMaterial.color = Color.Lerp(Color.blue, lighterBlue, pulseFactor);
+            }
+        }
+
+        //Pulsing and color change for explosion radius
+        if (isTriggered && explosionRadiusTransform != null)
+        {
+            explosionRadiusVFX.SetActive(true);
+
+            //Pulse grows outwards only (no back motion)
+            float pulseFrequency = GetPulseFrequency(remainingTime, maxTime);
+            float sawtoothTime = (Time.time * pulseSpeed * pulseFrequency) % 1f;
+            float explosionScale = explosionRadius * Mathf.Lerp(0.5f, 1f, sawtoothTime);
+            explosionRadiusTransform.localScale = new Vector3(explosionScale, explosionScale, 1f);
+
+            //Dynamically change the material color for explosion radius based on time remaining
+            if (cloudMaterial != null)
+            {
+                Color lightRed = new Color(1f, 0f, 0f, 0.2f); 
+                Color lightYellow = new Color(1f, 1f, 0f, 0.8f);   
+                cloudMaterial.color = Color.Lerp(lightRed, lightYellow, 1f - remainingTime / maxTime);
+            }
+        }
+
+        //Hide detection radius once triggered
+        if (isTriggered && detectionRadiusVFX != null)
+        {
+            detectionRadiusVFX.SetActive(false);
+        }
+    }
+
+    //Returns pulsing speeds
+    private float GetPulseFrequency(float remainingTime, float maxTime)
+    {
+        //Categorize remaining time into thresholds
+        if (remainingTime > maxTime * 0.6f)
+            return 1.2f; //Medium pulse
+        else if (remainingTime > maxTime * 0.3f)
+            return 1.5f; //Fast pulse
+        else
+            return 5f; //Xtra Speedy pulse
+    }
+
+    //-------------------- UI/GUI FUNCTIONS --------------------//
     //Visualizing the bot's variables for debugging (color, shape-visual & label)
     void OnDrawGizmosSelected()
     {
@@ -457,4 +591,5 @@ public class DroneBot : MonoBehaviour
                 break;
         }
     }
+
 }
