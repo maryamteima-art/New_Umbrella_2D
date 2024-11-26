@@ -3,45 +3,30 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class ButtonVFXManager : MonoBehaviour
+//Manages the behavior, interactions and animations
+//Keeping ButtonVFXHandler in its own script allows me to reuse it with other managers or in different contexts.
+public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, ISelectHandler, IDeselectHandler
 {
-    [HideInInspector] private string vfxPrefabPath = "Prefabs/VFX/DancingShapes";
-    [HideInInspector] private Vector3 offset = Vector3.zero;
-    [HideInInspector] private float clickDuration = 0.5f;
-
-    void Start()
-    {
-        // Find all buttons in the children of this GameObject
-        Button[] buttons = GetComponentsInChildren<Button>();
-
-        foreach (Button button in buttons)
-        {
-            // Add a VFX handler for each button
-            ButtonVFXHandler handler = button.gameObject.AddComponent<ButtonVFXHandler>();
-            handler.Initialize(vfxPrefabPath, offset, clickDuration);
-        }
-    }
-}
-
-public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
-{
-    private string vfxPrefabPath;
+    private string vfxPrefabPath;        
     private GameObject currentVFXInstance;
+    //Position offset for the VFX
     private Vector3 offset;
-    private float clickDuration;
+    //Duration of the click animation effect
+    private float clickDuration;        
     private bool isClickAnimationActive = false;
-    //Store the original scale of the VFX instance
-    private Vector3 initialScale; 
+    //Original scale of the VFX instance
+    private Vector3 initialScale;
+    //Position for specific secondary effects (e.x. Stars)
+    private Vector3 starsPos;         
 
-    private Vector3 starsPos;
 
-    public void Initialize(string prefabPath, Vector3 positionOffset, float duration)
+    public void SetupVFX(string prefabPath, Vector3 positionOffset, float duration)
     {
         vfxPrefabPath = prefabPath;
         offset = positionOffset;
         clickDuration = duration;
 
-        //Load the VFX prefab from Resources
+        //Load the VFX prefab from the Resources folder
         GameObject vfxPrefab = Resources.Load<GameObject>(vfxPrefabPath);
         if (vfxPrefab == null)
         {
@@ -49,28 +34,28 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
             return;
         }
 
-        //Instantiate the VFX prefab at the button's position + offset
+        //Instantiate the VFX prefab
         currentVFXInstance = Instantiate(vfxPrefab, transform.position + offset, Quaternion.identity);
 
-        //Parent the VFX to the canvas, so it stays aligned with the button
+        // Parent the VFX to the canvas to align it with the button
         Canvas canvas = GetComponentInParent<Canvas>();
         if (canvas != null && currentVFXInstance != null)
         {
             currentVFXInstance.transform.SetParent(canvas.transform, false);
         }
 
-        //Match the size of the VFX to the button
+        //Adjust the position and scale of the VFX to match the button
         RectTransform rectTransform = GetComponent<RectTransform>();
         if (rectTransform != null && currentVFXInstance != null)
         {
-            currentVFXInstance.transform.position = new Vector3(rectTransform.position.x, rectTransform.position.y, -1) + offset;
+            currentVFXInstance.transform.position = rectTransform.position + offset;
             starsPos = currentVFXInstance.transform.position;
 
-            //Maintain the original aspect ratio of the VFX
+            //Scale the VFX to fit the button size while maintaining the aspect ratio
             float scaleFactor = Mathf.Min(rectTransform.rect.width, rectTransform.rect.height) * 0.1f;
-            currentVFXInstance.transform.localScale = new Vector3(scaleFactor + 2f, scaleFactor, scaleFactor);
+            currentVFXInstance.transform.localScale = new Vector3(scaleFactor + 5f, scaleFactor, scaleFactor);
 
-            //Store the initial scale for resetting later
+            //Store the initial scale for resetting after animations
             initialScale = currentVFXInstance.transform.localScale;
         }
 
@@ -78,48 +63,75 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         ParticleSystemRenderer psRenderer = currentVFXInstance.GetComponent<ParticleSystemRenderer>();
         if (psRenderer != null)
         {
-            psRenderer.sortingLayerName = "Default";
-            psRenderer.sortingOrder = 1;
+            psRenderer.sortingLayerName = "MenuUI";
+            psRenderer.sortingOrder = 0;
         }
 
-        //Initially hide the VFX
+        //Set VFX to be active but invisible initially
         if (currentVFXInstance != null)
         {
-            currentVFXInstance.SetActive(false);
+            currentVFXInstance.SetActive(true);
+            currentVFXInstance.GetComponent<Renderer>().enabled = false; 
         }
     }
 
-    //--------- BUTTON INTERACTION FUNCTIONS ------------\\
+    //-------------- MOUSE INTERACTIONS ----------------//
+    //Hover
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //Show the VFX on hover, but only if a click animation is not active
         if (currentVFXInstance != null && !isClickAnimationActive)
         {
-            currentVFXInstance.SetActive(true);
+            //Show the VFX
+            currentVFXInstance.GetComponent<Renderer>().enabled = true; 
         }
     }
-
-
+    //Unhover
     public void OnPointerExit(PointerEventData eventData)
     {
-        //Hide the VFX when the pointer exits, but only if no click animation is active
         if (currentVFXInstance != null && !isClickAnimationActive)
         {
-            currentVFXInstance.SetActive(false);
+            //Hide the VFX
+            currentVFXInstance.GetComponent<Renderer>().enabled = false; 
         }
     }
-
-
+    //click
     public void OnPointerClick(PointerEventData eventData)
     {
-        //Perform a pingpong effect before hiding the VFX
+        //trigger the pulsing click animation and play the stars
         if (currentVFXInstance != null && !isClickAnimationActive)
         {
             StartCoroutine(PlayPingPongEffect());
             VFXManager.Instance.PlayVFX("stars", starsPos);
         }
     }
-    //--------- ANIMATIONS & VISUALS FUNCTIONS ------------\\
+
+    //-------------- JOYSTICK INTERACTIONS ----------------//
+
+    //Hover
+    public void OnSelect(BaseEventData eventData)
+    {
+        // Show the VFX when the button is selected via joystick
+        if (currentVFXInstance != null && !isClickAnimationActive)
+        {
+            currentVFXInstance.SetActive(true);
+
+            currentVFXInstance.GetComponent<Renderer>().enabled = true;
+        }
+    }
+    //Unhover
+    public void OnDeselect(BaseEventData eventData)
+    {
+        // Hide the VFX when the button is deselected via joystick
+        if (currentVFXInstance != null)
+        {
+            currentVFXInstance.SetActive(false);
+
+            currentVFXInstance.GetComponent<Renderer>().enabled = false;
+        }
+    }
+
+    // -------------------- VISUALS AND ANIMATIONS ANIMATION -------------------------//
+    //Pulsing effect on clicking
     private IEnumerator PlayPingPongEffect()
     {
         isClickAnimationActive = true;
@@ -134,7 +146,7 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         {
             elapsedTime += Time.deltaTime;
 
-            //Generate a pingpong effect
+            // Create a ping-pong scaling effect
             float progress = elapsedTime / clickDuration;
             float scaleMultiplier = Mathf.PingPong(progress * 4f, 1f);
             currentVFXInstance.transform.localScale = initialScale * (1f + scaleMultiplier * 0.8f);
@@ -148,10 +160,11 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
         isClickAnimationActive = false;
     }
-    //--------- CLEANUP & WORLD FUNCTIONS ------------\\
+
+    // ---------- CLEANUP & OTHER GAME WORLD FUNCTIONS --------------//
     void OnDestroy()
     {
-        //Cleanup: Destroy the VFX when the button is destroyed
+        // Destroy the VFX instance when the button is destroyed
         if (currentVFXInstance != null)
         {
             Destroy(currentVFXInstance);
