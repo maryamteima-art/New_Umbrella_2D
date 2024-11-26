@@ -102,7 +102,11 @@ MonoBehaviour:
   movementSpeed: 1.6
   movementPattern: 0
   detectionRange: 4
+  deflectionMode: 0
   detectionType: 1
   followDuration: 2.7
   followSpeed: 6.2
   explosionRadius: 3
+  totalTimeToExplode: 5
+  deflectionForceMultiplier: 0.1
+  playerForceMultiplier: 1.1
