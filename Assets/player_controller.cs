@@ -97,93 +97,96 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     void Update()
     {
-        // Apply forces
-        if (!umbrellaActive)
+        if (!PauseMenu.GamePaused)
         {
+            // Apply forces
+            if (!umbrellaActive)
+            {
+                if (grounded && !isLaunching)
+                {
+                    // If on ground and not launching, apply ground force logic
+                    rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
+
+                    //Animator
+                    robotAnimator.SetBool("Grounded", grounded);
+                    robotAnimator.SetFloat("Horizontal", moveInput.x);
+
+                }
+                else if (!grounded)
+                {
+                    // If in air, work with air control (drift slower logic)
+                    float airControl = moveInput.x * moveSpeed * airMultiplier;
+                    rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
+                    // Calculate and apply aerial velocity
+                    Vector2 velocity = rb.velocity;
+                    velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
+                    rb.velocity = velocity;
+                }
+            }
+
+            // Dampen player on ground (fast stop while running)
             if (grounded && !isLaunching)
             {
-                // If on ground and not launching, apply ground force logic
-                rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
-                
-                //Animator
-                robotAnimator.SetBool("Grounded", grounded);
-                robotAnimator.SetFloat("Horizontal", moveInput.x);
-
-            }
-            else if (!grounded)
-            {
-                // If in air, work with air control (drift slower logic)
-                float airControl = moveInput.x * moveSpeed * airMultiplier;
-                rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
-                // Calculate and apply aerial velocity
                 Vector2 velocity = rb.velocity;
-                velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
+                velocity.x *= damping;
                 rb.velocity = velocity;
+
             }
-        }
 
-        // Dampen player on ground (fast stop while running)
-        if (grounded && !isLaunching)
-        {
-            Vector2 velocity = rb.velocity;
-            velocity.x *= damping;
-            rb.velocity = velocity;
-
-        }
-        
-        // Update last direction based on move input
-        if (moveInput.x > 0)
-        {
-            lastDirectionRight = true;
-            
-            //Animator
-            robotSpriteRenderer.flipX = false;
-            
-            if ((Time.time - lastWalk >= walkCooldown) && (grounded))
+            // Update last direction based on move input
+            if (moveInput.x > 0)
             {
-                //SoundFX
-                SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
-                
-                lastWalk = Time.time;
+                lastDirectionRight = true;
+
+                //Animator
+                robotSpriteRenderer.flipX = false;
+
+                if ((Time.time - lastWalk >= walkCooldown) && (grounded))
+                {
+                    //SoundFX
+                    SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
+
+                    lastWalk = Time.time;
+                }
+
             }
-            
-        }
-        else if (moveInput.x < 0)
-        {
-            lastDirectionRight = false;
-            
-            //Animator
-            robotSpriteRenderer.flipX = true;
-            
-            if ((Time.time - lastWalk >= walkCooldown) && (grounded))
+            else if (moveInput.x < 0)
             {
-                //SoundFX
-                SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
-                
-                lastWalk = Time.time;
+                lastDirectionRight = false;
+
+                //Animator
+                robotSpriteRenderer.flipX = true;
+
+                if ((Time.time - lastWalk >= walkCooldown) && (grounded))
+                {
+                    //SoundFX
+                    SoundFXManager.instance.PlayWalkClip(transform, 0.5f);
+
+                    lastWalk = Time.time;
+                }
             }
-        }
-        
 
-        // Continuously update charge meter if the decrease rate is set
-        if (chargeMeterDecreaseRate > 0)
-        {
-            UpdateChargeMeter();
-        }
 
-        //VFX: GRADUAL TRAIL DISABLE
-        //If grounded and trail-time is not up yet
-        if (grounded && trailRenderer.time > 0)
-        {
-            //Gradually decrease trail time once player is grounded
-            trailRenderer.time -= fadeOutSpeed * Time.deltaTime;
-            //If 0 reached
-            if (trailRenderer.time < 0)
+            // Continuously update charge meter if the decrease rate is set
+            if (chargeMeterDecreaseRate > 0)
             {
-                //Reset time counter
-                trailRenderer.time = 0;
-                //Disable trail completely
-                trailRenderer.enabled = false; 
+                UpdateChargeMeter();
+            }
+
+            //VFX: GRADUAL TRAIL DISABLE
+            //If grounded and trail-time is not up yet
+            if (grounded && trailRenderer.time > 0)
+            {
+                //Gradually decrease trail time once player is grounded
+                trailRenderer.time -= fadeOutSpeed * Time.deltaTime;
+                //If 0 reached
+                if (trailRenderer.time < 0)
+                {
+                    //Reset time counter
+                    trailRenderer.time = 0;
+                    //Disable trail completely
+                    trailRenderer.enabled = false;
+                }
             }
         }
     }
@@ -235,7 +238,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                     GameObject closestSpawner = null;
                     float playerX = transform.position.x;
                     float closestX = float.MinValue;
-
+                    //Gamepad.current.SetMotorSpeeds(0.25f, 0.30f);
+                    //Gamepad.current.SetMotorSpeeds(0f, 0f);
+                    StartCoroutine(TriggerVibration(0.15f));
                     foreach (GameObject spawner in spawners)
                     {
                         float spawnerX = spawner.transform.position.x;
@@ -295,6 +300,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
+        //Gamepad.current.SetMotorSpeeds(0.25f, 0.30f);
         Vector2 input = context.ReadValue<Vector2>();
 
         // Dead zone margin
@@ -428,5 +434,17 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     private bool HasFuel()
     {
         return chargeMeter.transform.localScale.y > 0;
+    }
+
+    private IEnumerator TriggerVibration(float time)
+    {
+        // Set motor speeds to create the vibration effect
+        Gamepad.current.SetMotorSpeeds(0.25f, 0.30f);
+
+        // Wait for a short duration
+        yield return new WaitForSeconds(time);
+
+        // Stop the vibration
+        Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
 }

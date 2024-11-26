@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 
 public class PauseMenu : MonoBehaviour
 {
@@ -22,11 +23,13 @@ public class PauseMenu : MonoBehaviour
             KeyCode keyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), "JoystickButton" + i);
             if (Input.GetKeyDown(keyCode))
             {
-                Debug.Log("Pressed: " + keyCode);
+                Debug.Log("Pressed: " + keyCode); //
+                //if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton7))
+                //https://docs.unity3d.com/Packages/com.unity.inputsystem@1.0/api/UnityEngine.InputSystem.Gamepad.html
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Escape) || Input.GetKeyDown(KeyCode.JoystickButton9) || Input.GetKeyDown(KeyCode.JoystickButton7))
+        if (Input.GetKeyDown(KeyCode.Escape) || Gamepad.current.startButton.wasPressedThisFrame)
         {
             Debug.Log("escape");
             if (GamePaused)
@@ -48,6 +51,8 @@ public class PauseMenu : MonoBehaviour
             PauseUI.SetActive(true);
             Time.timeScale = 0f;
             GamePaused = true;
+        InputSystem.PauseHaptics();
+
 
 
     }
@@ -57,6 +62,7 @@ public class PauseMenu : MonoBehaviour
             PauseUI.SetActive(false);
             Time.timeScale = 1f;
             GamePaused = false;
+        InputSystem.ResumeHaptics();
 
     }
 

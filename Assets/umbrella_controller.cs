@@ -255,6 +255,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             Vector3 direction = new Vector3(Mathf.Cos(swingAngle * Mathf.Deg2Rad), Mathf.Sin(swingAngle * Mathf.Deg2Rad), 0);
             transform.localPosition = direction * displacement;
             transform.localRotation = Quaternion.Euler(0, 0, swingAngle - 90f);
+            StartCoroutine(TriggerVibration(swingDuration));
         }
         else
         {
@@ -317,6 +318,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 {
                     playerRb.velocity = Vector2.zero;
                     VFXManager.Instance.PlayVFX("LinesExplosion", transform.position + new Vector3(0, 0.5f, 0));
+                    StartCoroutine(TriggerVibration(0.10f));
 
                     //SoundFX
                     SoundFXManager.instance.PlayHitHazardClip(transform, 1f);
@@ -368,5 +370,16 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         {
             isFacingRight = false;
         }
+    }
+    private IEnumerator TriggerVibration(float time)
+    {
+        // Set motor speeds to create the vibration effect
+        Gamepad.current.SetMotorSpeeds(0.01f, 0.03f);
+
+        // Wait for a short duration
+        yield return new WaitForSeconds(time);
+
+        // Stop the vibration
+        Gamepad.current.SetMotorSpeeds(0f, 0f);
     }
 }
