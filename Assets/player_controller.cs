@@ -396,12 +396,15 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             grounded = true;
             UpdateChargeMeter();
-            
+
             //Animator
             robotAnimator.SetBool("Grounded", grounded);
             
             //SoundFX
             SoundFXManager.instance.PlayLandClip(transform, 0.5f);
+
+            //VFX
+            VFXManager.Instance.PlayVFX("dust", transform.position);
         }
     }
 

@@ -442,6 +442,8 @@ public class DroneBot : MonoBehaviour
         {
             Debug.Log("Player respawned at the nearest checkpoint.");
             player.position = closestRespawn.transform.position;
+            //VFX
+            VFXManager.Instance.PlayVFX("stars", closestRespawn.transform.position);
         }
     }
 
@@ -542,6 +544,81 @@ public class DroneBot : MonoBehaviour
         else
             return 5f; //Xtra Speedy pulse
     }
+
+    //----- FOR SPAWNING ----------
+    private void SpawnGlow(Vector3 position, float duration, float maxScale, Color startColor, Color endColor)
+    {
+        //Create a glow sphere at the specified position
+        GameObject glowSphere = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        glowSphere.transform.position = position;
+        //Start's small
+        glowSphere.transform.localScale = Vector3.zero;
+        //Remove unnecessary collider
+        Destroy(glowSphere.GetComponent<Collider>()); 
+
+        //Assign a material to the sphere
+        Renderer renderer = glowSphere.GetComponent<Renderer>();
+        Material glowMaterial = new Material(Shader.Find("Unlit/Color"));
+        renderer.material = glowMaterial;
+        glowMaterial.color = startColor;
+
+        //Start a coroutine to animate the glow
+        StartCoroutine(GlowAnimation(glowSphere, glowMaterial, duration, maxScale, startColor, endColor));
+    }
+    
+    //Creates a glowing orb anywhere with custmoizable colors
+    private IEnumerator GlowAnimation(GameObject glowObject, Material glowMaterial, float duration, float maxScale, Color startColor, Color endColor)
+    {
+        float elapsedTime = 0f;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+
+            //Calculate progress as a percentage (0 to 1)
+            float progress = elapsedTime / duration;
+
+            //Use a sawtooth function for pulsing outward
+            float scale = Mathf.Lerp(0f, maxScale, progress);
+            glowObject.transform.localScale = new Vector3(scale, scale, scale);
+
+            //Interpolate color for fading effect
+            glowMaterial.color = Color.Lerp(startColor, endColor, progress);
+
+            yield return null;
+        }
+
+        //Destroy the glow object after the animation is complete
+        Destroy(glowObject);
+    }
+
+    //Has colors & timing predefined for quicker implementation in checkpoints
+    void OnSpawnOrCheckpoint(Vector3 spawnPosition)
+    {
+        // Define glow parameters
+        float glowDuration = 2f; 
+        float maxGlowScale = 3f;
+        //Bright orange
+        Color startColor = new Color(1f, 0.5f, 0f, 1f);
+        //Transparent
+        Color endColor = new Color(1f, 0.5f, 0f, 0f); 
+
+        //Trigger the glow effect
+        SpawnGlow(spawnPosition, glowDuration, maxGlowScale, startColor, endColor);
+    }
+
+    private IEnumerator ChangeCheckpointColor(Renderer checkpointRenderer, Color tempColor, Color originalColor, float duration)
+    {
+        //Change to temporary color (yellow)
+        checkpointRenderer.material.color = tempColor;
+
+        //Wait for the specified duration
+        yield return new WaitForSeconds(duration);
+
+        //Revert to the original color (green)
+        checkpointRenderer.material.color = originalColor;
+    }
+
 
     //-------------------- UI/GUI FUNCTIONS --------------------//
     //Visualizing the bot's variables for debugging (color, shape-visual & label)

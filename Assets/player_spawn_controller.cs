@@ -1,4 +1,7 @@
 using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
 
 public class PlayerSpawnController : MonoBehaviour
 {
@@ -26,6 +29,9 @@ public class PlayerSpawnController : MonoBehaviour
             if (player != null)
             {
                 player.transform.position = spawnPosition;
+
+                //PLAY VFX
+                VFXManager.Instance.PlayVFX("stars", spawnPosition);
             }
         }
     }
