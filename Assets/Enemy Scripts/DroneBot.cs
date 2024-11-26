@@ -39,17 +39,6 @@ public class DroneBot : MonoBehaviour
     [Tooltip("Time before the bot explodes after being triggered.")]
     [SerializeField] public float totalTimeToExplode = 5f;
 
-
-    /// <summary>
-    /// Blake here! Just added this- dunno what it does to your code- but it would not run without this addition.
-    /// </summary>
-    // Total time before the bot explodes
-    [Tooltip("Total time before the bot explodes.")]
-    public float totalTimeToExplode = 5f;
-
-    // Force applied during deflection
-    private float deflectionForce;
-
     //----- Internal Variables -------
 
     //Initial position of the bot

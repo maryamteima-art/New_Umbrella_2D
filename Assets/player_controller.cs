@@ -54,6 +54,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     public bool hasBubble = false; // Indicates if player has a bubble
 
+    private bool isHitStopActive = false;
+
     void Awake()
     {
         inputActions = new PlayerInputActions();
@@ -293,12 +295,33 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();
+        Vector2 input = context.ReadValue<Vector2>();
+
+        // Dead zone margin
+        float deadZone = 0.1f;
+
+        // Apply dead zone
+        if (input.magnitude < deadZone)
+        {
+            moveInput = Vector2.zero;
+        }
+        else
+        {
+            moveInput = input;
+        }
     }
 
     public void HitStop(float milliseconds, System.Action onComplete = null)
     {
-        StartCoroutine(HitStopCoroutine(milliseconds, onComplete));
+        if (isHitStopActive) return; // Prevent re-entry
+        isHitStopActive = true;
+        
+        StartCoroutine(HitStopCoroutine(milliseconds, () =>
+        {
+            // Debug.Log("HitStop complete");
+            isHitStopActive = false; // Reset flag
+            onComplete?.Invoke();
+        }));
     }
 
     private IEnumerator HitStopCoroutine(float milliseconds, System.Action onComplete)
@@ -306,17 +329,16 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         float originalTimeScale = Time.timeScale;
         try
         {
-            // Freeze game
             Time.timeScale = 0f;
+            // Debug.Log("Time scale set to 0");
             StartCoroutine(ScreenShakeCoroutine(milliseconds / 1000f));
             yield return new WaitForSecondsRealtime(milliseconds / 1000f);
         }
         finally
         {
-            // Ensure time reset
             Time.timeScale = originalTimeScale;
+            // Debug.Log("Time scale reset to: " + Time.timeScale);
         }
-        // Execute callback
         onComplete?.Invoke();
     }
 
