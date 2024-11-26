@@ -6,10 +6,12 @@ public class BubbleController : MonoBehaviour
 {
     private PlayerController playerController;
     private Collider2D bubbleCollider;
+    private Vector3 initialPosition;
 
     private void Awake()
     {
         bubbleCollider = GetComponent<Collider2D>();
+        initialPosition = transform.position;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -32,10 +34,13 @@ public class BubbleController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // If no longer equipped on player, must be broken (delete self)
+        // If no longer equipped on player, reset
         if (playerController != null && !playerController.hasBubble)
         {
-            Destroy(gameObject);
+            transform.SetParent(null);
+            bubbleCollider.isTrigger = true;
+            transform.position = initialPosition;
+            playerController = null;
         }
     }
 }

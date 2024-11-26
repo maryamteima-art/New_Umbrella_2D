@@ -6,12 +6,13 @@ public class WaterController : MonoBehaviour
 {
     public float floatForce = 5f;
     private Rigidbody2D playerRb;
+    private PlayerController player;
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
-            var player = other.GetComponent<PlayerController>();
+            player = other.GetComponent<PlayerController>();
             if (player != null && player.hasBubble)
             {
                 playerRb = other.GetComponent<Rigidbody2D>();
@@ -29,7 +30,7 @@ public class WaterController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (playerRb != null)
+        if (playerRb != null && player.hasBubble)
         {
             float adjustedForce = floatForce * 200f;
             playerRb.AddForce(Vector2.up * adjustedForce * Time.fixedDeltaTime, ForceMode2D.Force);
