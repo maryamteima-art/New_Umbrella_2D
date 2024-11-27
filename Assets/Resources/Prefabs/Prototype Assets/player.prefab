@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4009059533285664678}
   - component: {fileID: 5700850363683572549}
+  - component: {fileID: 714406266813576958}
   m_Layer: 0
   m_Name: GroundCheck
   m_TagString: Untagged
@@ -26,7 +27,7 @@ Transform:
   m_GameObject: {fileID: 384020630722957996}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0.108, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -61,10 +62,10 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.51}
+  m_Offset: {x: 0, y: -1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -75,8 +76,20 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.1, y: 1}
+  m_Size: {x: 0.3, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &714406266813576958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 384020630722957996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0691586a3c14c447aa911ea54d78fc4b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &393166459190496341
 GameObject:
   m_ObjectHideFlags: 0
@@ -181,7 +194,6 @@ MonoBehaviour:
   slowFallGravityScale: 0.1
   slowedColor: {r: 0, g: 0, b: 1, a: 1}
   slowFallSpeed: 1
-  umbrellaOpen: 0
   umbrellaAngle: 0
   umbrellaDownColor: {r: 0, g: 1, b: 0, a: 1}
   hazardLayer:
