@@ -153,7 +153,7 @@ public class DroneBot : MonoBehaviour
         };
 
         //Load material from Resources folder
-        cloudMaterial = Resources.Load<Material>("VFX Materials/ScratchGrain");
+        cloudMaterial = Resources.Load<Material>("VFX Materials/NewScratch");
         if (cloudMaterial == null)
         {
             Debug.LogError("Could not find cloudMaterial in Resources!");
