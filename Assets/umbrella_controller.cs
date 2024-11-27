@@ -285,6 +285,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             {
                 //SoundFX
                 SoundFXManager.instance.PlayLandWaterClip(transform, 1f);
+
+                //PlayVfx
+                VFXManager.Instance.PlayVFX("Pop", transform.position);
             }
         }
             
