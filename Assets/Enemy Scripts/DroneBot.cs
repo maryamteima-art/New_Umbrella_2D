@@ -294,7 +294,7 @@ public class DroneBot : MonoBehaviour
         Vector2 playerKnockbackDirection;
 
         //Determine deflection behavior when the umbrella is open
-        if (umbrellaController != null && umbrellaController.umbrellaOpen)
+        if (umbrellaController != null && UmbrellaController.umbrellaOpen)
         {
             //Calculate umbrella deflection direction
             Vector2 umbrellaDirection = GetUmbrellaDeflectionDirection();
