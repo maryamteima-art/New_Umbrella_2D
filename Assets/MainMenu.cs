@@ -7,6 +7,7 @@ public class MainMenu : MonoBehaviour
 {
     public string scene;
     public Color loadToColor = Color.white;
+    public AudioSource audioSource;
 
     public void LoadGame()
     {
@@ -19,6 +20,7 @@ public class MainMenu : MonoBehaviour
         {
             // Load the scene
             // LoadGame();
+            audioSource.Stop();
             Initiate.Fade(scene, loadToColor, 0.5f);
             //Debug.Log("I EXIST");
         }
@@ -32,6 +34,7 @@ public class MainMenu : MonoBehaviour
             if (Input.GetKey("joystick button " + i))
             {
                 return true;
+                
             }
         }
         return false;
