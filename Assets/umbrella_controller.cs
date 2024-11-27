@@ -231,9 +231,11 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     void PerformSwing()
     {
         float elapsedTime = Time.time - swingStartTime;
-        if (elapsedTime < swingDuration / currentSwingSpeed)
+        float totalSwingDuration = swingDuration / currentSwingSpeed;
+
+        if (elapsedTime < totalSwingDuration)
         {
-            float swingProgress = elapsedTime / (swingDuration / currentSwingSpeed);
+            float swingProgress = elapsedTime / totalSwingDuration;
             float swingAngle = Mathf.Lerp(90, swingExtent, swingProgress);
             if (!isFacingRight)
             {
