@@ -209,49 +209,23 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
     void StartSwing(float triggerDepth)
     {
-        // Debug log to check triggerDepth value
-        Debug.Log("Trigger Depth: " + triggerDepth);
-
-        // Ensure triggerDepth is within expected range
-        triggerDepth = Mathf.Clamp01(triggerDepth);
-
-        // Prepare for swing but do not start it
+        // Prepare for swing
         umbrellaOpen = false;
         transform.localScale = closedSize;
-        playerRb.gravityScale = originalGravityScale; 
-        playerSpriteRenderer.color = originalColor; 
-        swingExtent = Mathf.Lerp(90, -30, triggerDepth); 
+        playerRb.gravityScale = originalGravityScale;
+        playerSpriteRenderer.color = originalColor;
+        swingExtent = Mathf.Lerp(90, -30, triggerDepth);
         currentSwingSpeed = Mathf.Lerp(0.5f, 2f, triggerDepth);
-        originalPosition = transform.position; 
-        originalRotation = transform.rotation; 
+        originalPosition = transform.position;
+        originalRotation = transform.rotation;
     }
 
     void StopSwing()
     {
-        //SoundFX
-        SoundFXManager.instance.PlaySwingClip(transform, 0.5f);
-        
-        // Start the swing when the trigger is released
+        // Start the swing
         isSwinging = true;
         umbrellaOpen = true;
         swingStartTime = Time.time;
-
-        Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
-        float joystickMagnitude = orientationInput.magnitude;
-
-        if (joystickMagnitude < 0.1f)
-        {
-            direction = Vector3.zero;
-        }
-
-        if (direction != Vector3.zero)
-        {
-            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
-            if (angle < 0) angle += 360f;
-
-            transform.position = player.position + direction * displacement;
-            transform.rotation = Quaternion.Euler(0, 0, angle);
-        }
     }
 
     void PerformSwing()
