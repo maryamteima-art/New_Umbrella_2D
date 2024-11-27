@@ -102,28 +102,28 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             // Apply forces
             //if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
-            
-                if (grounded && !isLaunching )
-                {
-                    // If on ground and not launching, apply ground force logic
-                    rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
 
-                    //Animator
-                    robotAnimator.SetBool("Grounded", grounded);
-                    robotAnimator.SetFloat("Horizontal", moveInput.x);
+            if (grounded && !isLaunching)
+            {
+                // If on ground and not launching, apply ground force logic
+                rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
 
-                }
-                else if (!grounded)
-                {
-                    // If in air, work with air control (drift slower logic)
-                    float airControl = moveInput.x * moveSpeed * airMultiplier;
-                    rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
-                    // Calculate and apply aerial velocity
-                    Vector2 velocity = rb.velocity;
-                    velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
-                    rb.velocity = velocity;
-                }
+                //Animator
+                robotAnimator.SetBool("Grounded", grounded);
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
+
             }
+            else if (!grounded)
+            {
+                // If in air, work with air control (drift slower logic)
+                float airControl = moveInput.x * moveSpeed * airMultiplier;
+                rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
+                // Calculate and apply aerial velocity
+                Vector2 velocity = rb.velocity;
+                velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
+                rb.velocity = velocity;
+            }
+
 
             // Dampen player on ground (fast stop while running)
             if (grounded && !isLaunching)
@@ -189,6 +189,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                     trailRenderer.enabled = false;
                 }
             }
+        }
+            
         
     }
 

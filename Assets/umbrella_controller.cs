@@ -90,9 +90,12 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     /* Wait and check for umbrella rotations and swings  */
     void Update()
     {
-        HandleUmbrellaOrientation();
-        HandleSwinging();
-        previousOrientationInput = orientationInput;
+        if (!PauseMenu.GamePaused)
+        {
+            HandleUmbrellaOrientation();
+            HandleSwinging();
+            previousOrientationInput = orientationInput;
+        }
     }
 
     /* Calculate and apply necessary umbrella orientation */

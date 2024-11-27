@@ -9,6 +9,7 @@ public class PauseMenu : MonoBehaviour
     public static bool GamePaused = false;
     public GameObject PauseUI;
     public GameObject PauseButtonPrompt;
+    //public AudioSource audioSource;
 
     public string scene;
     public Color loadToColor = Color.white;
