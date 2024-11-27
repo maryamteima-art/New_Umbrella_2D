@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="501be47d-7165-499f-9604-8efb220044d8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robot_float _new.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robot_float _new.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robot_land_new.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robot_land_new.png.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robotwalk_new.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robotwalk_new.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Float.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Float.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Idle.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Idle.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Land.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Land.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Walk_L.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Walk_L.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Walk_R.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/anim_Walk_R.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/player.controller" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/player.controller" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CharacterSprite/robot_float.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/CharacterSprite/robot_float.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Resources/VFX Materials/ScratchGrain.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/VFX Materials/ScratchGrain.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/tutorial_level.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/tutorial_level.unity" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 4
+}]]></component>
+  <component name="ProjectId" id="2pQxBl7uah4d4GRitriJpv0ZP8t" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "git-widget-placeholder": "Merging main",
+    "nodejs_package_manager_path": "npm",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-PY-242.22855.92" />
+        <option value="bundled-python-sdk-b068d85d1acf-399fe30bd8c1-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-242.22855.92" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="501be47d-7165-499f-9604-8efb220044d8" name="Changes" comment="" />
+      <created>1732711967551</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732711967551</updated>
+      <workItem from="1732711969548" duration="24000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
