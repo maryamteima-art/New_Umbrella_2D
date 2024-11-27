@@ -101,9 +101,9 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!PauseMenu.GamePaused)
         {
             // Apply forces
-            if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
-            {
-                if (grounded && !isLaunching)
+            //if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
+            
+                if (grounded && !isLaunching )
                 {
                     // If on ground and not launching, apply ground force logic
                     rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
@@ -189,7 +189,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                     trailRenderer.enabled = false;
                 }
             }
-        }
+        
     }
 
     private void UpdateChargeMeter()

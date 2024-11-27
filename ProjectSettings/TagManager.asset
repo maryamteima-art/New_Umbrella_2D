@@ -11,6 +11,7 @@ TagManager:
   - Kill Wall
   - Bubble
   - Umbrella_Wind
+  - tutorial_spawn
   layers:
   - Default
   - TransparentFX
