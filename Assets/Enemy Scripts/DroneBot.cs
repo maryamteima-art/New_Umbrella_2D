@@ -2,6 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 public class DroneBot : MonoBehaviour
 {
     //-------- Flexible Variables -----------
@@ -624,47 +628,46 @@ public class DroneBot : MonoBehaviour
     //Visualizing the bot's variables for debugging (color, shape-visual & label)
     void OnDrawGizmosSelected()
     {
-
-
-        //Detection range
+        // Detection range
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(transform.position, detectionRange);
+
+        #if UNITY_EDITOR
         UnityEditor.Handles.Label(transform.position + Vector3.right * (detectionRange + 0.2f) + Vector3.up * -1.5f, "Detection Range");
+        #endif
 
-
-        //Explosion range
+        // Explosion range
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, explosionRadius);
+
+        #if UNITY_EDITOR
         UnityEditor.Handles.Label(transform.position + Vector3.right * (explosionRadius - 0.5f) + Vector3.up * 2.5f, "Explosion Range");
-
-
-        //Overall debug label
         UnityEditor.Handles.Label(transform.position + Vector3.up * +7f, "**Enemy Bot Variable View**");
+        #endif
 
-
-        //Patrol range visualization
+        // Patrol range visualization
         Gizmos.color = Color.yellow;
         switch (movementPattern)
         {
             case MovementPattern.Vertical:
-                // Vertical movement bounds
                 Gizmos.DrawWireCube(transform.position, new Vector3(0.1f, patrolRange * 2, 0.1f));
+                #if UNITY_EDITOR
                 UnityEditor.Handles.Label(transform.position + Vector3.up * (patrolRange + 0.5f), "Patrol Range (Vertical)");
+                #endif
                 break;
 
             case MovementPattern.Linear:
-                //Show horizontal patrol bounds
                 Gizmos.DrawWireCube(transform.position, new Vector3(patrolRange * 2, 0.1f, 0.1f));
+                #if UNITY_EDITOR
                 UnityEditor.Handles.Label(transform.position + Vector3.right * (patrolRange + 0.5f), "Patrol Range (Horizontal)");
-
+                #endif
                 break;
 
             case MovementPattern.Radial:
-                //Show a circular patrol area
                 Gizmos.DrawWireSphere(transform.position, patrolRange);
-                UnityEditor.Handles.Label(
-                    transform.position + Vector3.right * (patrolRange + 0.5f) + Vector3.up * 0.5f,
-                    "Patrol Range (Radial)");
+                #if UNITY_EDITOR
+                UnityEditor.Handles.Label(transform.position + Vector3.right * (patrolRange + 0.5f) + Vector3.up * 0.5f, "Patrol Range (Radial)");
+                #endif
                 break;
         }
     }

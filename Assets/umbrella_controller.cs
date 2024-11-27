@@ -65,9 +65,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         playerController = player.GetComponent<PlayerController>();
-        
-        // Debug log to verify input setup
-        Debug.Log("Input Actions Setup Complete");
     }
 
     void OnEnable()
@@ -236,6 +233,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         
         // Start the swing when the trigger is released
         isSwinging = true;
+        umbrellaOpen = true;
         swingStartTime = Time.time;
 
         Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
@@ -274,7 +272,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
         else
         {
-            isSwinging = false; // Stop swinging after one cycle
+            isSwinging = false;
+            umbrellaOpen = false;
         }
     }
 
