@@ -192,7 +192,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         
     }
 
-    private void UpdateChargeMeter()
+    public void UpdateChargeMeter()
     {
         // Calculate new height based on time and decrease rate
         float newHeight = chargeMeter.transform.localScale.y - (chargeMeterDecreaseRate * Time.deltaTime);
@@ -398,39 +398,40 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         }
     }
 
-    void OnCollisionEnter2D(Collision2D collision)
-    {
-        // Check if GroundCheck collides with Terrain
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = true;
-            UpdateChargeMeter();
+// New ground detection logic is on the GroundCheck child using "groundchecker" script
+    // void OnCollisionEnter2D(Collision2D collision)
+    // {
+    //     // Check if GroundCheck collides with Terrain
+    //     if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+    //     {
+    //         grounded = true;
+    //         UpdateChargeMeter();
 
-            //Animator
-            robotAnimator.SetBool("Grounded", grounded);
+    //         //Animator
+    //         robotAnimator.SetBool("Grounded", grounded);
             
-            //SoundFX
-            SoundFXManager.instance.PlayLandClip(transform, 0.5f);
+    //         //SoundFX
+    //         SoundFXManager.instance.PlayLandClip(transform, 0.5f);
 
-            //VFX
-            VFXManager.Instance.PlayVFX("dust", transform.position);
-        }
-    }
+    //         //VFX
+    //         VFXManager.Instance.PlayVFX("dust", transform.position);
+    //     }
+    // }
 
-    void OnCollisionExit2D(Collision2D collision)
-    {
-        // Check if GroundCheck exits collision with Terrain
-        if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
-        {
-            grounded = false;
-            UpdateChargeMeter();
+    // void OnCollisionExit2D(Collision2D collision)
+    // {
+    //     // Check if GroundCheck exits collision with Terrain
+    //     if (collision.gameObject.layer == LayerMask.NameToLayer("Terrain"))
+    //     {
+    //         grounded = false;
+    //         UpdateChargeMeter();
             
-            //Animator
-            robotAnimator.SetBool("Grounded", grounded);
+    //         //Animator
+    //         robotAnimator.SetBool("Grounded", grounded);
             
             
-        }
-    }
+    //     }
+    // }
 
     //FOR VFX:
     // Method to check if the charge meter has fuel
