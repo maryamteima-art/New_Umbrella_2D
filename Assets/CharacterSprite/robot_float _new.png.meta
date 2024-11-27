@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ddefa90aa1c2b5b489f6bc5a9fac26ec
+guid: 497e1607202c3cc4698b3ac59569f118
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -107,7 +107,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -120,11 +120,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Android
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -136,7 +136,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: robot_float_0
+      name: robot_float _new_0
       rect:
         serializedVersion: 2
         x: 0
@@ -150,14 +150,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4390caeb3ca5fc84887052c072587f36
-      internalID: 589989168
+      spriteID: f2fa7e5ae2177be4dbafeca3fa61e0c2
+      internalID: 236791275
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_1
+      name: robot_float _new_1
       rect:
         serializedVersion: 2
         x: 48
@@ -171,14 +171,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 301edab48fd46844990921fe504e381a
-      internalID: -1660938169
+      spriteID: f1d2f63a138b95f4ebebb6e7b5bca418
+      internalID: 2086138479
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_2
+      name: robot_float _new_2
       rect:
         serializedVersion: 2
         x: 96
@@ -192,14 +192,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ed95c898ec06b864a8a308d72b049f03
-      internalID: 2007266376
+      spriteID: c2d69a44912c96b42ab57d4ea7eb43d8
+      internalID: -677144803
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_3
+      name: robot_float _new_3
       rect:
         serializedVersion: 2
         x: 144
@@ -213,8 +213,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ae87020134f50004eb0c22f2fea0087d
-      internalID: -898306664
+      spriteID: 97cd35bd92e27154090867b74d89a27a
+      internalID: -1381427256
       vertices: []
       indices: 
       edges: []
@@ -230,10 +230,10 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      robot_float_0: 589989168
-      robot_float_1: -1660938169
-      robot_float_2: 2007266376
-      robot_float_3: -898306664
+      robot_float _new_0: 236791275
+      robot_float _new_1: 2086138479
+      robot_float _new_2: -677144803
+      robot_float _new_3: -1381427256
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
