@@ -66,7 +66,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         playerController = player.GetComponent<PlayerController>();
         
-        // Sprite adjustments
+        // Debug log to verify input setup
+        Debug.Log("Input Actions Setup Complete");
     }
 
     void OnEnable()
@@ -135,12 +136,12 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if ((angle > 315f || angle < 45f) && !isInWind)
             {
                 playerRb.gravityScale = 0f;
-                playerSpriteRenderer.color = slowedColor;
+                // playerSpriteRenderer.color = slowedColor;
                 isUmbrellaFacingDown = false;
             }
             else if (angle > 135f && angle < 225f)
             {
-                playerSpriteRenderer.color = umbrellaDownColor;
+                // playerSpriteRenderer.color = umbrellaDownColor;
                 isUmbrellaFacingDown = true;
                 umbrellaDown = true;
             }
@@ -211,18 +212,21 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
     void StartSwing(float triggerDepth)
     {
-        isSwinging = true;
-        swingStartTime = Time.time;
+        // Debug log to check triggerDepth value
+        Debug.Log("Trigger Depth: " + triggerDepth);
+
+        // Ensure triggerDepth is within expected range
+        triggerDepth = Mathf.Clamp01(triggerDepth);
+
+        // Prepare for swing but do not start it
         umbrellaOpen = false;
         transform.localScale = closedSize;
         playerRb.gravityScale = originalGravityScale; 
         playerSpriteRenderer.color = originalColor; 
         swingExtent = Mathf.Lerp(90, -30, triggerDepth); 
-        currentSwingSpeed = Mathf.Lerp(2f, 0.5f, triggerDepth); 
+        currentSwingSpeed = Mathf.Lerp(0.5f, 2f, triggerDepth);
         originalPosition = transform.position; 
         originalRotation = transform.rotation; 
-        
-        
     }
 
     void StopSwing()
@@ -230,7 +234,10 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         //SoundFX
         SoundFXManager.instance.PlaySwingClip(transform, 0.5f);
         
-        isSwinging = false;
+        // Start the swing when the trigger is released
+        isSwinging = true;
+        swingStartTime = Time.time;
+
         Vector3 direction = new Vector3(orientationInput.x, orientationInput.y, 0).normalized;
         float joystickMagnitude = orientationInput.magnitude;
 
@@ -267,7 +274,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
         else
         {
-            StopSwing();
+            isSwinging = false; // Stop swinging after one cycle
         }
     }
 
@@ -367,7 +374,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     void ResetGravityAndColor()
     {
         playerRb.gravityScale = originalGravityScale;
-        playerSpriteRenderer.color = originalColor;
     }
 
     public void OnOrient(InputAction.CallbackContext context)
