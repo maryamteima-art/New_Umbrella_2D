@@ -1,7 +1,10 @@
 using System.Collections;
+using System.Collections.Generic;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using UnityEngine.VFX;
 
 //Manages the behavior, interactions and animations
 //Keeping ButtonVFXHandler in its own script allows me to reuse it with other managers or in different contexts.
@@ -17,8 +20,22 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     //Original scale of the VFX instance
     private Vector3 initialScale;
     //Position for specific secondary effects (e.x. Stars)
-    private Vector3 starsPos;         
+    private Vector3 starsPos;
 
+    //BACKDROP VFXs
+    //Reference to the panel containing the buttons
+    public RectTransform panelRectTransform;
+    //Reference to the PauseUI GameObject
+    public GameObject pauseMenu;
+    //Path to the VFX prefab in Resources
+    public string bgPrefabPath = "Prefabs/VFX/DancingRadialShapes";
+    //Instance of the VFX prefab
+    private GameObject bgInstance;
+    //Flag to prevent multiple VFX plays
+    private bool vfxPlayed = false;
+
+
+    
 
     public void SetupVFX(string prefabPath, Vector3 positionOffset, float duration)
     {
@@ -53,7 +70,7 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
             //Scale the VFX to fit the button size while maintaining the aspect ratio
             float scaleFactor = Mathf.Min(rectTransform.rect.width, rectTransform.rect.height) * 0.1f;
-            currentVFXInstance.transform.localScale = new Vector3(scaleFactor + 5f, scaleFactor, scaleFactor);
+            currentVFXInstance.transform.localScale = new Vector3(scaleFactor + 2.5f, scaleFactor, scaleFactor);
 
             //Store the initial scale for resetting after animations
             initialScale = currentVFXInstance.transform.localScale;
@@ -118,6 +135,16 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
             currentVFXInstance.GetComponent<Renderer>().enabled = true;
         }
     }
+
+    public void OnSubmit(BaseEventData eventData)
+    {
+        Debug.Log("OnSubmit triggered.");
+        if (currentVFXInstance != null && !isClickAnimationActive)
+        {
+            StartCoroutine(PlayPingPongEffect());
+        }
+    }
+
     //Unhover
     public void OnDeselect(BaseEventData eventData)
     {
@@ -146,8 +173,8 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         {
             elapsedTime += Time.deltaTime;
 
-            // Create a ping-pong scaling effect
-            float progress = elapsedTime / clickDuration;
+            //Create a ping-pong scaling effect
+            float progress = elapsedTime/clickDuration;
             float scaleMultiplier = Mathf.PingPong(progress * 4f, 1f);
             currentVFXInstance.transform.localScale = initialScale * (1f + scaleMultiplier * 0.8f);
 
@@ -161,6 +188,116 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         isClickAnimationActive = false;
     }
 
+    //VFX Backdrop (stars or dancing shapes)
+    void BgStart()
+    {
+        //Check if panelRectTransform is assigned, and if not, find the Canvas RectTransform
+        if (panelRectTransform == null)
+        {
+            Canvas canvas = GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                panelRectTransform = canvas.GetComponent<RectTransform>();
+                Debug.Log("Using Canvas RectTransform as fallback.");
+            }
+            else
+            {
+                Debug.LogError("No Canvas or Panel RectTransform found!");
+            }
+        }
+
+        //Load and instantiate the VFX prefab from the Resources folder
+        GameObject bgPrefab = Resources.Load<GameObject>(bgPrefabPath);
+        if (bgPrefab != null)
+        {
+            bgInstance = Instantiate(bgPrefab, Vector3.zero, Quaternion.identity);
+
+            // Parent to the panelRectTransform (either the panel or the canvas as fallback)
+            if (panelRectTransform != null)
+            {
+                bgInstance.transform.SetParent(panelRectTransform, false);
+                bgInstance.transform.localPosition = Vector3.zero; // Center on the RectTransform
+            }
+
+            //Initially hide the VFX
+            bgInstance.SetActive(false);
+        }
+        else
+        {
+            Debug.LogError("VFX prefab not found at path: " + bgPrefabPath);
+        }
+    }
+
+    void BgUpdate()
+    {
+        if (panelRectTransform != null)
+        {
+            Debug.Log($"Panel active state: {panelRectTransform.gameObject.activeSelf}");
+        }
+        else
+        {
+            Debug.LogError("Panel RectTransform is null!");
+        }
+
+        if (panelRectTransform != null && panelRectTransform.gameObject.activeSelf && !vfxPlayed)
+        {
+            Debug.Log("Panel is active, playing VFX.");
+            ShowBackdropVFX();
+            vfxPlayed = true;
+        }
+        else if (panelRectTransform != null && !panelRectTransform.gameObject.activeSelf && vfxPlayed)
+        {
+            Debug.Log("Panel is inactive, hiding VFX.");
+            HideBackdropVFX();
+            vfxPlayed = false;
+        }
+    }
+
+
+    public void ShowBackdropVFX(float scaleMultiplier = 4.0f) 
+    {
+        if (bgInstance != null && panelRectTransform != null)
+        {
+            //Use the panel position for VFX positioning
+            bgInstance.transform.position = panelRectTransform.position;
+
+            //Adjust scale of the VFX
+            bgInstance.transform.localScale = Vector3.one * scaleMultiplier;
+
+            bgInstance.SetActive(true);
+
+            //Play the particle system
+            ParticleSystem ps = bgInstance.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Play();
+            }
+
+            Debug.Log("Showing backdrop VFX at panel center: " + panelRectTransform.position);
+        }
+        else
+        {
+            Debug.LogWarning("Backdrop VFX instance or panel RectTransform is not assigned!");
+        }
+    }
+
+    public void HideBackdropVFX()
+    {
+        if (bgInstance != null)
+        {
+            //Stop the particle system
+            ParticleSystem ps = bgInstance.GetComponent<ParticleSystem>();
+            if (ps != null)
+            {
+                ps.Stop();
+            }
+
+            bgInstance.SetActive(false);
+
+            Debug.Log("Hiding backdrop VFX.");
+        }
+    }
+
     // ---------- CLEANUP & OTHER GAME WORLD FUNCTIONS --------------//
     void OnDestroy()
     {
@@ -168,6 +305,12 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
         if (currentVFXInstance != null)
         {
             Destroy(currentVFXInstance);
+        }
+
+        //Destroy the BgVFX instance when the object is destroyed
+        if (bgInstance != null)
+        {
+            Destroy(bgInstance);
         }
     }
 }

@@ -260,6 +260,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             }
             else {
                 hasBubble = false;
+                //PLAY VFX
+                VFXManager.Instance.PlayVFX("PopBubble", transform.position);
             }
         }
     }

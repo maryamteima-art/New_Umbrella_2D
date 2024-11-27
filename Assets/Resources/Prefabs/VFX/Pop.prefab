@@ -10,15 +10,19 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1622652966622311776, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.b
-      value: 0.82813823
+      value: 0.6855345
       objectReference: {fileID: 0}
     - target: {fileID: 1622652966622311776, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.g
-      value: 0.9748427
+      value: 0.5416369
       objectReference: {fileID: 0}
     - target: {fileID: 1622652966622311776, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
       propertyPath: ColorModule.gradient.maxGradient.key0.r
-      value: 0.5180767
+      value: 0.109944105
+      objectReference: {fileID: 0}
+    - target: {fileID: 1622652966622311776, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
+      propertyPath: ColorModule.gradient.maxGradient.key1.g
+      value: 0.8357134
       objectReference: {fileID: 0}
     - target: {fileID: 1622652966622311776, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
@@ -66,7 +70,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4133136094983376677, guid: fa7361abc1d001042908ec1fc53f0dce, type: 3}
       propertyPath: m_Name
-      value: plop Variant
+      value: Pop
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
