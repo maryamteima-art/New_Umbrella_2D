@@ -122,6 +122,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 Vector2 velocity = rb.velocity;
                 velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
                 rb.velocity = velocity;
+
+                robotAnimator.SetBool("Grounded", grounded);
             }
 
 
