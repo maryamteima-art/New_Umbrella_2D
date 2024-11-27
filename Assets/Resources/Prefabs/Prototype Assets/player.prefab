@@ -474,8 +474,8 @@ CapsuleCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 2}
+  m_Offset: {x: 0, y: -0.2}
+  m_Size: {x: 0.7, y: 1.6}
   m_Direction: 0
 --- !u!114 &8459599206141467238
 MonoBehaviour:
@@ -510,3 +510,4 @@ MonoBehaviour:
   terrainLayer:
     serializedVersion: 2
     m_Bits: 0
+  hasBubble: 0
