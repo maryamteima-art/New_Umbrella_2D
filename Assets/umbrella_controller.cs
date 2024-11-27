@@ -236,11 +236,13 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         if (elapsedTime < totalSwingDuration)
         {
             float swingProgress = elapsedTime / totalSwingDuration;
-            float swingAngle = Mathf.Lerp(90, swingExtent, swingProgress);
+            float swingAngle = Mathf.Lerp(90, -60, swingProgress);
+
             if (!isFacingRight)
             {
                 swingAngle = 180 - swingAngle;
             }
+
             Vector3 direction = new Vector3(Mathf.Cos(swingAngle * Mathf.Deg2Rad), Mathf.Sin(swingAngle * Mathf.Deg2Rad), 0);
             transform.localPosition = direction * displacement;
             transform.localRotation = Quaternion.Euler(0, 0, swingAngle - 90f);
