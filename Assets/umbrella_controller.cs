@@ -13,7 +13,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public Color slowedColor = Color.magenta; 
     
     public float slowFallSpeed = 1f; 
-    public bool umbrellaOpen = false;
+    public static bool umbrellaOpen = false;
+    public static bool umbrellaDown = false;
     public float umbrellaAngle = 0;
     
     public Color umbrellaDownColor = Color.green; 
@@ -26,7 +27,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public float waterCollisionCooldown = 0.25f; 
 
     private Vector3 closedSize = new Vector3(0.25f, 2f, 1f); 
-    private Vector3 openSize = new Vector3(2.5f, 0.5f, 1f); 
+    private Vector3 openSize = new Vector3(2.5f, 0.5f, 1f);
+    public static float umbrella_size;
     private bool wasM1 = false;
     private Rigidbody2D playerRb;
     private SpriteRenderer playerSpriteRenderer;
@@ -137,11 +139,13 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             {
                 playerSpriteRenderer.color = umbrellaDownColor;
                 isUmbrellaFacingDown = true;
+                umbrellaDown = true;
             }
             else
             {
                 ResetGravityAndColor();
                 isUmbrellaFacingDown = false;
+                umbrellaDown = false;
             }
         }
         else
@@ -179,7 +183,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
 
         float currentUmbrellaWidth = transform.localScale.x;
-
+        Debug.Log("Umbrella width"+ currentUmbrellaWidth); //0.25 and 2.5
+        
         // Update max umbrella width logic
         if (currentUmbrellaWidth > previousUmbrellaWidth)
         {

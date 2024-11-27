@@ -39,7 +39,7 @@ public class wind_controller : MonoBehaviour
             // If umbrella (and it is open), apply force to player
             Rigidbody2D parentRb = other.transform.parent.GetComponent<Rigidbody2D>();
             UmbrellaController umbrella = other.GetComponent<UmbrellaController>();
-            if (parentRb != null && umbrella != null && umbrella.umbrellaOpen)
+            if (parentRb != null && umbrella != null && UmbrellaController.umbrellaOpen)
             {
                 // Calc angle between wind and umbrella
                 float umbrellaAngleRad = (umbrella.umbrellaAngle + 90f) * Mathf.Deg2Rad;

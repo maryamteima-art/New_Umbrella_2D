@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public bool hasBubble = false; // Indicates if player has a bubble
 
     private bool isHitStopActive = false;
+     //UmbrellaController umbrella = other.GetComponent<UmbrellaController>();
 
     void Awake()
     {
@@ -100,7 +101,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!PauseMenu.GamePaused)
         {
             // Apply forces
-            if (!umbrellaActive)
+            if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
             {
                 if (grounded && !isLaunching)
                 {

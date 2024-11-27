@@ -10,6 +10,7 @@ TagManager:
   - Player Spawn
   - Kill Wall
   - Bubble
+  - Umbrella_Wind
   layers:
   - Default
   - TransparentFX
