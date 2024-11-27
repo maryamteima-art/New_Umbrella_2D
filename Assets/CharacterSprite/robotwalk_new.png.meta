@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ddefa90aa1c2b5b489f6bc5a9fac26ec
+guid: 4a55c385021cd684fa6baf28492a322a
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -107,7 +107,7 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Server
+    buildTarget: Android
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
@@ -120,11 +120,11 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
-    buildTarget: Android
+    buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -136,7 +136,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: robot_float_0
+      name: robotwalk_new_0
       rect:
         serializedVersion: 2
         x: 0
@@ -150,14 +150,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4390caeb3ca5fc84887052c072587f36
-      internalID: 589989168
+      spriteID: d434d6118e5382640acf734ce101c2dc
+      internalID: 1699564375
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_1
+      name: robotwalk_new_1
       rect:
         serializedVersion: 2
         x: 48
@@ -171,14 +171,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 301edab48fd46844990921fe504e381a
-      internalID: -1660938169
+      spriteID: ca416c311d99f31488ac471fbec371bb
+      internalID: -1252953370
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_2
+      name: robotwalk_new_2
       rect:
         serializedVersion: 2
         x: 96
@@ -192,14 +192,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ed95c898ec06b864a8a308d72b049f03
-      internalID: 2007266376
+      spriteID: 0c5797dde28a1a7458430ec85f53825f
+      internalID: 59364098
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_float_3
+      name: robotwalk_new_3
       rect:
         serializedVersion: 2
         x: 144
@@ -213,8 +213,92 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ae87020134f50004eb0c22f2fea0087d
-      internalID: -898306664
+      spriteID: 49ae731b243ef3844bc86774d9abd38c
+      internalID: -68348433
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: robotwalk_new_4
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 949e8e7935923d541b1627c89e7eba9e
+      internalID: -814845574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: robotwalk_new_5
+      rect:
+        serializedVersion: 2
+        x: 240
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 314764855a0556c49859c31ff6683ee2
+      internalID: 2094679848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: robotwalk_new_6
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: debcbd0aac5a19443a6b863f715d2ad4
+      internalID: 1868745827
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: robotwalk_new_7
+      rect:
+        serializedVersion: 2
+        x: 336
+        y: 0
+        width: 48
+        height: 48
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62442c9d7ab1b264fb6cc3b6eecf2925
+      internalID: -938895636
       vertices: []
       indices: 
       edges: []
@@ -230,10 +314,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      robot_float_0: 589989168
-      robot_float_1: -1660938169
-      robot_float_2: 2007266376
-      robot_float_3: -898306664
+      robotwalk_new_0: 1699564375
+      robotwalk_new_1: -1252953370
+      robotwalk_new_2: 59364098
+      robotwalk_new_3: -68348433
+      robotwalk_new_4: -814845574
+      robotwalk_new_5: 2094679848
+      robotwalk_new_6: 1868745827
+      robotwalk_new_7: -938895636
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
