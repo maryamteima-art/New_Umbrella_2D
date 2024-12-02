@@ -33,9 +33,15 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private GameObject bgInstance;
     //Flag to prevent multiple VFX plays
     private bool vfxPlayed = false;
+    public void TriggerVFX()
+    {
+        if (currentVFXInstance != null)
+        {
+            currentVFXInstance.SetActive(true);
+            currentVFXInstance.GetComponent<Renderer>().enabled = true;
+        }
+    }
 
-
-    
 
     public void SetupVFX(string prefabPath, Vector3 positionOffset, float duration)
     {
@@ -135,6 +141,7 @@ public class ButtonVFXHandler : MonoBehaviour, IPointerEnterHandler, IPointerExi
             currentVFXInstance.GetComponent<Renderer>().enabled = true;
         }
     }
+
 
     public void OnSubmit(BaseEventData eventData)
     {
