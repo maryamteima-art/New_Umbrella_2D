@@ -392,7 +392,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
             //FOR VFX: THRUST CHECKER
             if (HasFuel()) { 
-            VFXManager.Instance.PlayVFX("boost", transform.position + new Vector3(0, 0.5f, 0));
+            VFXManager.Instance.PlayVFX("NewThrust", transform.position + new Vector3(0, -0.5f, 0));
             }
         }
         else if (context.phase == InputActionPhase.Canceled)
