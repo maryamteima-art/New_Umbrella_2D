@@ -39,13 +39,15 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     private float chargeMeterDecreaseRate = 0f;
 
-    //FOR VFX
+    //-------- FOR VFX ---------
     //Trail object attached to the player (for gliding)
     public TrailRenderer trailRenderer;
-    //The normal trail time when in wind
-    public float defaultTrailTime = 10.0f;
-    //Speed of fade out of trail
-    public float fadeOutSpeed = 0.5f; 
+    //How quickly the trail shrinks (in width to give illusion of fading away, since the fade-out didn't work)
+    public float trailShrinkSpeed = 5f;
+    private float exitWindTimer = 0f;
+    private bool exitingWind = false;
+
+    //-------- END OF VFX-------
 
     // Add a reference to the GroundCheck object
     public Transform groundCheck;
@@ -93,6 +95,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (trailRenderer != null)
         {
             trailRenderer.enabled = false;
+            //Reset the trail to avoid residual effects
+            trailRenderer.Clear();
         }
     }
 
@@ -176,19 +180,80 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 UpdateChargeMeter();
             }
 
-            //VFX: GRADUAL TRAIL DISABLE
-            //If grounded and trail-time is not up yet
-            if (grounded && trailRenderer.time > 0)
+            //VFX: ENABLE & DISABLE TRAIL 
+            if (grounded)
             {
-                //Gradually decrease trail time once player is grounded
-                trailRenderer.time -= fadeOutSpeed * Time.deltaTime;
-                //If 0 reached
-                if (trailRenderer.time < 0)
+                //Gradually reduce trail width and disable when done
+                if (trailRenderer != null && trailRenderer.widthMultiplier > 0f)
                 {
-                    //Reset time counter
-                    trailRenderer.time = 0;
-                    //Disable trail completely
-                    trailRenderer.enabled = false;
+                    trailRenderer.widthMultiplier -= trailShrinkSpeed * Time.deltaTime;
+
+                    //Fully hide the trail when the width reaches zero
+                    if (trailRenderer.widthMultiplier <= 0f)
+                    {
+                        //Clamping
+                        trailRenderer.widthMultiplier = 0f;
+                        //Clear lingering trails
+                        trailRenderer.Clear();
+                        //Disable trail
+                        trailRenderer.enabled = false;
+                    }
+                }
+            }
+            else if (inWind)
+            {
+                //Reset exitWindTimer and exitingWind flag
+                exitWindTimer = 0f;
+                exitingWind = false;
+
+                //Gradually increase the trail width to its default value
+                if (trailRenderer != null && !trailRenderer.enabled)
+                {
+                    //Re-enable the trail if disabled
+                    trailRenderer.enabled = true;
+                }
+
+                if (trailRenderer != null && trailRenderer.widthMultiplier < 1f)
+                {
+                    trailRenderer.widthMultiplier += trailShrinkSpeed * Time.deltaTime;
+
+                    //Clamp width to maximum (default)
+                    if (trailRenderer.widthMultiplier > 1f)
+                    {
+                        trailRenderer.widthMultiplier = 1f;
+                    }
+                }
+            }
+            else
+            {
+                //If exiting the winded region, start the timer
+                if (!exitingWind)
+                {
+                    exitingWind = true;
+                    //Set the delay time (how long it stays on out-of-wind region)
+                    exitWindTimer = 3f; 
+                }
+
+                //Countdown the exit timer
+                if (exitingWind && exitWindTimer > 0f)
+                {
+                    exitWindTimer -= Time.deltaTime;
+                }
+                else
+                {
+                    // Gradually reduce the trail width after the delay
+                    if (trailRenderer != null && trailRenderer.widthMultiplier > 0f)
+                    {
+                        trailRenderer.widthMultiplier -= trailShrinkSpeed * Time.deltaTime;
+
+                        //Fully hide the trail when the width reaches zero (clamp, clear & disable)
+                        if (trailRenderer.widthMultiplier <= 0f)
+                        {
+                            trailRenderer.widthMultiplier = 0f;
+                            trailRenderer.Clear();
+                            trailRenderer.enabled = false;
+                        }
+                    }
                 }
             }
         }
@@ -276,16 +341,6 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (other.CompareTag("Wind"))
         {
             inWind = true;
-
-            //VFX: WIND TRAIL 
-            // Activate trail renderer when in wind
-            if (!trailRenderer.enabled)
-            {
-                //Reset trail time to default (0.5)
-                trailRenderer.time = defaultTrailTime;
-                //Enable/activate trail
-                trailRenderer.enabled = true;
-            }
 
             if (Time.time - lastCollisionTime >= windCollisionCooldown) 
             {
