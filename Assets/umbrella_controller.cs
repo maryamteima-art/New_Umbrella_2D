@@ -176,7 +176,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                     Vector2 launchDirection = previousOrientationInput.normalized;
                     playerRb.AddForce(launchDirection * forceMagnitude * launchForceMultiplier, ForceMode2D.Impulse);
                     lastLaunchTime = Time.time;
-                    VFXManager.Instance.PlayVFX("SpeedLines", transform.position);
+                    VFXManager.Instance.PlayVFX("dashPoof", transform.position);
                 }
             }
 
