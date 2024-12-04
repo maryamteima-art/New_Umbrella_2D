@@ -112,7 +112,13 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
             if (angle < 0) angle += 360f;
 
-            transform.position = player.position + direction * displacement; 
+            transform.position = player.position + direction * displacement;
+
+            //testing umbreala offset position
+
+            transform.position += new Vector3(0.75f, 0, 0);
+
+
             transform.rotation = Quaternion.Euler(0, 0, angle);
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
 
