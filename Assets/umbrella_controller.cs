@@ -100,39 +100,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
     }
 
-    // this doesnt work correctly yet 
-    void HandleUmbrellaFlip(Vector3 direction) 
-    {
-        transform.position = player.position + direction * displacement;
-
-        //testing umbreala offset position
-        if (playerSpriteRenderer.flipX)
-        {
-            if (umbrellaFlipX == playerSpriteRenderer.flipX) 
-            {
-                umbrellaFlipX = playerSpriteRenderer.flipX;
-
-                transform.position -= new Vector3(0.9f, 0, 0);
-                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
-            }
-
-
-        }
-        else
-        {
-            if (umbrellaFlipX != playerSpriteRenderer.flipX)
-            {
-                umbrellaFlipX = playerSpriteRenderer.flipX;
-
-                transform.position += new Vector3(0.9f, 0, 0);
-                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
-            }
-
-        }
-
-        //wasUmbrellaFlipped = playerSpriteRenderer.flipX;
-    }
-
     /* Calculate and apply necessary umbrella orientation */
     void HandleUmbrellaOrientation()
     {
@@ -142,21 +109,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         if (joystickMagnitude < 0.1f)
         {
             direction = Vector3.zero;
-
-            //UMBRELLA OFFSET POSITION
-            transform.position = player.position + direction * displacement;
-            transform.position += new Vector3(0.9f, 2, 0);
-
-            //if (playerSpriteRenderer.flipX)
-            //{
-            //    transform.position -= new Vector3(0.9f, -2, 0);
-            //    //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
-            //}
-            //else
-            //{
-            //    transform.position += new Vector3(0.9f, 2, 0);
-            //    //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
-            //}
         }
 
         if (direction != Vector3.zero)
@@ -168,22 +120,6 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
 
             //UMBRELLA OFFSET POSITION
             transform.position += new Vector3(0.9f, 0, 0);
-
-
-            //testing umbreala offset position
-            //if (playerSpriteRenderer.flipX)
-            //{
-            //    transform.position -= new Vector3(0.9f, 0, 0);
-            //    //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
-            //}
-            //else
-            //{
-            //    transform.position += new Vector3(0.9f, 0, 0);
-            //    //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
-            //}
-
-
-
 
             transform.rotation = Quaternion.Euler(0, 0, angle);
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
