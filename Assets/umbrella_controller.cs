@@ -143,19 +143,20 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         {
             direction = Vector3.zero;
 
-            //testing umbreala offset position
+            //UMBRELLA OFFSET POSITION
             transform.position = player.position + direction * displacement;
+            transform.position += new Vector3(0.9f, 2, 0);
 
-            if (playerSpriteRenderer.flipX)
-            {
-                transform.position -= new Vector3(0.9f, -2, 0);
-                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
-            }
-            else
-            {
-                transform.position += new Vector3(0.9f, 2, 0);
-                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
-            }
+            //if (playerSpriteRenderer.flipX)
+            //{
+            //    transform.position -= new Vector3(0.9f, -2, 0);
+            //    //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            //}
+            //else
+            //{
+            //    transform.position += new Vector3(0.9f, 2, 0);
+            //    //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            //}
         }
 
         if (direction != Vector3.zero)
@@ -164,19 +165,22 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if (angle < 0) angle += 360f;
 
             transform.position = player.position + direction * displacement;
-            //HandleUmbrellaFlip(direction);
+
+            //UMBRELLA OFFSET POSITION
+            transform.position += new Vector3(0.9f, 0, 0);
+
 
             //testing umbreala offset position
-            if (playerSpriteRenderer.flipX)
-            {
-                transform.position -= new Vector3(0.9f, 0, 0);
-                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
-            }
-            else
-            {
-                transform.position += new Vector3(0.9f, 0, 0);
-                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
-            }
+            //if (playerSpriteRenderer.flipX)
+            //{
+            //    transform.position -= new Vector3(0.9f, 0, 0);
+            //    //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            //}
+            //else
+            //{
+            //    transform.position += new Vector3(0.9f, 0, 0);
+            //    //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            //}
 
 
 

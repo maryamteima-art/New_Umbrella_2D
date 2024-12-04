@@ -127,6 +127,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
                 rb.velocity = velocity;
 
+                //Animator
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
                 robotAnimator.SetBool("Grounded", grounded);
             }
 
@@ -162,7 +164,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 lastDirectionRight = false;
 
                 //Animator
-                robotSpriteRenderer.flipX = true;
+                //robotSpriteRenderer.flipX = true;
 
                 if ((Time.time - lastWalk >= walkCooldown) && (grounded))
                 {
