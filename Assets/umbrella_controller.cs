@@ -55,6 +55,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private float previousUmbrellaWidth = 0f;
     private float maxUmbrellaWidth = 0f;
 
+    // umbrella flipped
+    private bool wasUmbrellaFlipped = false;
+
     /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
     {
@@ -93,6 +96,26 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             HandleUmbrellaOrientation();
             HandleSwinging();
             previousOrientationInput = orientationInput;
+
+        }
+    }
+
+    // this doesnt work correctly yet 
+    void HandleUmbrellaFlip(Vector3 direction) 
+    {
+        transform.position = player.position + direction * displacement;
+
+        //testing umbreala offset position
+        if (playerSpriteRenderer.flipX != wasUmbrellaFlipped)
+        {
+            wasUmbrellaFlipped = true;
+            transform.position -= new Vector3(0.9f, 0, 0);
+            //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+        }
+        else
+        {
+            transform.position += new Vector3(0.9f, 0, 0);
+            //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
         }
     }
 
@@ -115,8 +138,18 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             transform.position = player.position + direction * displacement;
 
             //testing umbreala offset position
+            if (playerSpriteRenderer.flipX) 
+            {
+                transform.position -= new Vector3(0.9f, 0, 0);
+                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            }
+            else 
+            {
+                transform.position += new Vector3(0.9f, 0, 0);
+                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            }
 
-            transform.position += new Vector3(0.75f, 0, 0);
+            
 
 
             transform.rotation = Quaternion.Euler(0, 0, angle);
