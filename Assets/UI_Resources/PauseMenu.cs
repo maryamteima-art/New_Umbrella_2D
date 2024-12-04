@@ -8,22 +8,17 @@ using UnityEngine.EventSystems;
 public class PauseMenu : MonoBehaviour
 {
     public static bool GamePaused = false;
-    public static bool firstPaused = false;
     public GameObject PauseUI;
     public GameObject resumeButton;
-    public GameObject pausePrompt;
-
-    public Animator pausePromptAni;
     //public AudioSource audioSource;
 
     public string scene;
     public Color loadToColor = Color.white;
     // Update is called once per frame
     void Update()
-    {
 
-        PauseUI.SetActive(false);
-        // Check all joystick buttons (0 to 19 is a)
+    {
+        // Check all joystick buttons (0 to 19 is a common range, but you can extend it if needed)
         for (int i = 0; i <= 19; i++)
         {
             KeyCode keyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), "JoystickButton" + i);
@@ -42,7 +37,6 @@ public class PauseMenu : MonoBehaviour
             {
 
                     ContinueGame();
-                    firstPaused = true;
             }
             else
             {
@@ -60,6 +54,10 @@ public class PauseMenu : MonoBehaviour
             GamePaused = true;
             InputSystem.PauseHaptics();
            // EventSystem.current.SetSelectedGameObject(resumeButton);
+
+
+
+
     }
 
     public void ContinueGame()
@@ -67,12 +65,7 @@ public class PauseMenu : MonoBehaviour
             PauseUI.SetActive(false);
             Time.timeScale = 1f;
             GamePaused = false;
-            InputSystem.ResumeHaptics();
-            if (firstPaused)
-            {
-                pausePromptAni.SetBool("gamePaused", true);
-                //pausePrompt.SetActive(false);
-            }
+        InputSystem.ResumeHaptics();
 
     }
 

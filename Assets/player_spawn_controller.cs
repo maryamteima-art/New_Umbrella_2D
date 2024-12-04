@@ -1,14 +1,12 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using System;
+
 
 public class PlayerSpawnController : MonoBehaviour
 {
     [SerializeField] private GameObject player; // Reference to the player object
     private Vector3 spawnPosition;
-
-   
 
     private void Start()
     {
@@ -31,7 +29,6 @@ public class PlayerSpawnController : MonoBehaviour
             if (player != null)
             {
                 player.transform.position = spawnPosition;
-                Debug.Log("Play animation");
 
                 //PLAY VFX
                 VFXManager.Instance.PlayVFX("stars", player.transform.position);
@@ -45,7 +42,5 @@ public class PlayerSpawnController : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawSphere(transform.position, 0.5f);
     }
-
- 
 
 }
