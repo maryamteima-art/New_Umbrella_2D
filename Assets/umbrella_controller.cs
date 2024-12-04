@@ -8,8 +8,13 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     public Transform player;
     public float displacement = 1.0f; 
     public float forceMagnitude = 100f;
-    public float slowFallGravityScale = 0.1f; 
+    public float slowFallGravityScale = 0.1f;
     
+    // Handle
+    public Transform handle;
+    private Vector3 handleClosedSize = new Vector3(0.05f, 0.005f, 1f);
+    private Vector3 handleOpenSize = new Vector3(0.0075f, 0.05f, 1f);
+
     public Color slowedColor = Color.magenta; 
     
     public float slowFallSpeed = 1f; 
@@ -119,10 +124,17 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             transform.position = player.position + direction * displacement;
 
             //UMBRELLA OFFSET POSITION
-            transform.position += new Vector3(0.9f, 0, 0);
+            transform.position += new Vector3(0.888f, 0, 0);
 
             transform.rotation = Quaternion.Euler(0, 0, angle);
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
+
+
+            //handle scale
+            //handle.transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude) * -1;
+            //handle.transform.localScale = new Vector3(0.05f, 0.075f, 1);
+            //handle.transform.localScale = Vector3.Lerp(closedSize/10f, openSize/4f, 1);
+            handle.transform.localScale = Vector3.Lerp(handleClosedSize, handleOpenSize, joystickMagnitude);
 
             umbrellaOpen = joystickMagnitude >= 0.25f;
             umbrellaAngle = angle;
