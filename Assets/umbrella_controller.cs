@@ -56,7 +56,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private float maxUmbrellaWidth = 0f;
 
     // umbrella flipped
-    private bool wasUmbrellaFlipped = false;
+    private bool umbrellaFlipX = false;
 
     /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
@@ -106,17 +106,31 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         transform.position = player.position + direction * displacement;
 
         //testing umbreala offset position
-        if (playerSpriteRenderer.flipX != wasUmbrellaFlipped)
+        if (playerSpriteRenderer.flipX)
         {
-            wasUmbrellaFlipped = true;
-            transform.position -= new Vector3(0.9f, 0, 0);
-            //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            if (umbrellaFlipX == playerSpriteRenderer.flipX) 
+            {
+                umbrellaFlipX = playerSpriteRenderer.flipX;
+
+                transform.position -= new Vector3(0.9f, 0, 0);
+                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            }
+
+
         }
         else
         {
-            transform.position += new Vector3(0.9f, 0, 0);
-            //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            if (umbrellaFlipX != playerSpriteRenderer.flipX)
+            {
+                umbrellaFlipX = playerSpriteRenderer.flipX;
+
+                transform.position += new Vector3(0.9f, 0, 0);
+                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            }
+
         }
+
+        //wasUmbrellaFlipped = playerSpriteRenderer.flipX;
     }
 
     /* Calculate and apply necessary umbrella orientation */
@@ -128,6 +142,20 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         if (joystickMagnitude < 0.1f)
         {
             direction = Vector3.zero;
+
+            //testing umbreala offset position
+            transform.position = player.position + direction * displacement;
+
+            if (playerSpriteRenderer.flipX)
+            {
+                transform.position -= new Vector3(0.9f, -2, 0);
+                //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
+            }
+            else
+            {
+                transform.position += new Vector3(0.9f, 2, 0);
+                //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
+            }
         }
 
         if (direction != Vector3.zero)
@@ -136,20 +164,21 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             if (angle < 0) angle += 360f;
 
             transform.position = player.position + direction * displacement;
+            //HandleUmbrellaFlip(direction);
 
             //testing umbreala offset position
-            if (playerSpriteRenderer.flipX) 
+            if (playerSpriteRenderer.flipX)
             {
                 transform.position -= new Vector3(0.9f, 0, 0);
                 //transform.position = new Vector3(-0.9f,transform.position.y, transform.position.z);
             }
-            else 
+            else
             {
                 transform.position += new Vector3(0.9f, 0, 0);
                 //transform.position = new Vector3(0.9f, transform.position.y, transform.position.z);
             }
 
-            
+
 
 
             transform.rotation = Quaternion.Euler(0, 0, angle);
