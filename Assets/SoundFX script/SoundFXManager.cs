@@ -22,6 +22,8 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_Walk;
     [SerializeField] private AudioClip soundFX_hitHazard;
     [SerializeField] private AudioClip soundFX_checkPoint;
+    [SerializeField] private AudioClip soundFX_bubblePickup;
+    [SerializeField] private AudioClip soundFX_bubblePop;
 
 
 
@@ -258,5 +260,47 @@ public class SoundFXManager : MonoBehaviour
 
         // destroy after play
         Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public void PlayBubblePickupClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_bubblePickup;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
+
+    public void PlayBubblePopClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_bubblePop;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play(); 
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);    
     }
 }

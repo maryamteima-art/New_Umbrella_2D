@@ -21,6 +21,7 @@ public class BubbleController : MonoBehaviour
             playerController = other.GetComponent<PlayerController>();
             if (playerController != null)
             {
+                SoundFXManager.instance.PlayBubblePickupClip(transform, 1f);
                 playerController.hasBubble = true;
                 playerController.grounded = true;
 
@@ -34,9 +35,9 @@ public class BubbleController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        // If no longer equipped on player, reset
         if (playerController != null && !playerController.hasBubble)
         {
+            SoundFXManager.instance.PlayBubblePopClip(transform, 1f);
             transform.SetParent(null);
             bubbleCollider.isTrigger = true;
             transform.position = initialPosition;
