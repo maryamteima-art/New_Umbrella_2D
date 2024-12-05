@@ -12,6 +12,8 @@ TagManager:
   - Bubble
   - Umbrella_Wind
   - tutorial_spawn
+  - MountainArea
+  - CaveArea
   layers:
   - Default
   - TransparentFX

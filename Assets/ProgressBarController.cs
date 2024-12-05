@@ -23,8 +23,10 @@ public class ProgressBarController : MonoBehaviour
     {
         // Calculate the current distance in 2D space
         float currentDistance = Vector2.Distance(player.position, goal.position);
+        float progress = Mathf.Clamp(maxDistance - currentDistance, 0, maxDistance);
 
         // Update the progress bar
-        progressBar.value = maxDistance - currentDistance;
+        //progressBar.value = maxDistance - currentDistance;
+        progressBar.value = progress;
     }
 }
