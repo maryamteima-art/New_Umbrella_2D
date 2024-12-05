@@ -22,8 +22,8 @@ public class PauseMenu : MonoBehaviour
     void Update()
     {
 
-        PauseUI.SetActive(false);
-        // Check all joystick buttons (0 to 19 is a)
+        //PauseUI.SetActive(false);
+        // Check all joystick buttons (0 to 19)
         for (int i = 0; i <= 19; i++)
         {
             KeyCode keyCode = (KeyCode)System.Enum.Parse(typeof(KeyCode), "JoystickButton" + i);
@@ -40,14 +40,14 @@ public class PauseMenu : MonoBehaviour
             Debug.Log("escape");
             if (GamePaused)
             {
-
+               
                     ContinueGame();
-                    firstPaused = true;
+                    
             }
             else
             {
-
                     PauseGame();
+                    
             }
         }
         
@@ -59,7 +59,8 @@ public class PauseMenu : MonoBehaviour
             Time.timeScale = 0f;
             GamePaused = true;
             InputSystem.PauseHaptics();
-           // EventSystem.current.SetSelectedGameObject(resumeButton);
+            firstPaused = true;
+            // EventSystem.current.SetSelectedGameObject(resumeButton);
     }
 
     public void ContinueGame()
@@ -70,9 +71,13 @@ public class PauseMenu : MonoBehaviour
             InputSystem.ResumeHaptics();
             if (firstPaused)
             {
-                pausePromptAni.SetBool("gamePaused", true);
-                //pausePrompt.SetActive(false);
+            pausePromptAni.SetBool("FirstPaused", true);
+            StartCoroutine(PlayIdleActiveAnimation());
+                
+
+            //pausePrompt.SetActive(false);
             }
+        firstPaused = false;
 
     }
 
@@ -82,6 +87,25 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = 1f;
         GamePaused = false;
         Initiate.Fade(scene, loadToColor, 0.5f);
+
+    }
+
+    private IEnumerator PlayIdleActiveAnimation()
+    {
+        // Wait until the first animation finishes (assuming the first animation duration is known)
+        yield return new WaitForSeconds(pausePromptAni.GetCurrentAnimatorStateInfo(0).length);
+
+        //// pausePrompt.SetActive(false);
+        //AnimatorStateInfo stateInfo = pausePromptAni.GetCurrentAnimatorStateInfo(0);
+
+        //while (stateInfo.IsName("Close_Clip") && pausePromptAni.GetCurrentAnimatorStateInfo(0).normalizedTime < 1.0f)
+        //{
+        //    yield return null; // Wait for the frame
+        //    stateInfo = pausePromptAni.GetCurrentAnimatorStateInfo(0); // Update the state info
+        //}
+
+        // Set the GameObject inactive after the animation completes
+        pausePrompt.SetActive(false);
 
     }
 

@@ -204,7 +204,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
 
         float currentUmbrellaWidth = transform.localScale.x;
-        Debug.Log("Umbrella width"+ currentUmbrellaWidth); //0.25 and 2.5
+        //Debug.Log("Umbrella width"+ currentUmbrellaWidth); //0.25 and 2.5
         
         // Update max umbrella width logic
         if (currentUmbrellaWidth > previousUmbrellaWidth)

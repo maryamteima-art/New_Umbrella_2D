@@ -21,6 +21,7 @@ public class SoundFXManager : MonoBehaviour
     [SerializeField] private AudioClip soundFX_Swing;
     [SerializeField] private AudioClip soundFX_Walk;
     [SerializeField] private AudioClip soundFX_hitHazard;
+    [SerializeField] private AudioClip soundFX_checkPoint;
 
 
 
@@ -225,6 +226,26 @@ public class SoundFXManager : MonoBehaviour
 
         // assign audioclip
         audioSource.clip = soundFX_hitHazard;
+
+        // vvvolume
+        audioSource.volume = volume;
+
+        // play the sound!!
+        audioSource.Play();
+
+        // length of clip
+        float clipLength = audioSource.clip.length;
+
+        // destroy after play
+        Destroy(audioSource.gameObject, clipLength);
+    }
+    public void PlayCheckpointClip(Transform spawnTransform, float volume)
+    {
+        // create gameObject
+        AudioSource audioSource = Instantiate(soundFXObject, spawnTransform.position, Quaternion.identity);
+
+        // assign audioclip
+        audioSource.clip = soundFX_checkPoint;
 
         // vvvolume
         audioSource.volume = volume;

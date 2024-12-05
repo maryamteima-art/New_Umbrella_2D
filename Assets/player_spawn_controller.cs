@@ -34,7 +34,7 @@ public class PlayerSpawnController : MonoBehaviour
                 Debug.Log("Play animation");
 
                 //PLAY VFX
-                VFXManager.Instance.PlayVFX("stars", player.transform.position);
+                VFXManager.Instance.PlayVFX("star", player.transform.position);
             }
         }
     }
