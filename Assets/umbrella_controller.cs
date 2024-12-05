@@ -63,6 +63,10 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     // umbrella flipped
     private bool umbrellaFlipX = false;
 
+    // Time to wait before confirming the trigger is released
+    private float debounceTime = 0.1f; 
+    private Coroutine debounceCoroutine;
+
     /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
     {
@@ -219,6 +223,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         previousUmbrellaWidth = currentUmbrellaWidth;
     }
 
+    /* Perform swing if currently swinging */
     void HandleSwinging()
     {
         if (isSwinging)
@@ -227,6 +232,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         }
     }
 
+    /* Prepare for swing */
     void StartSwing(float triggerDepth)
     {
         // Prepare for swing
@@ -234,29 +240,38 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         transform.localScale = closedSize;
         playerRb.gravityScale = originalGravityScale;
         playerSpriteRenderer.color = originalColor;
-        swingExtent = Mathf.Lerp(90, -30, triggerDepth);
-        currentSwingSpeed = Mathf.Lerp(0.5f, 2f, triggerDepth);
-        originalPosition = transform.position;
-        originalRotation = transform.rotation;
+
+        // Clamp the trigger depth to ensure it's between 0 and 1
+        swingExtent = Mathf.Clamp(triggerDepth, 0f, 1f);
+
+        // Only start swinging if the trigger depth greater than the threshold
+        if (swingExtent > 0.1f)
+        {
+            isSwinging = true;
+            currentSwingSpeed = Mathf.Lerp(0.5f, 2f, swingExtent);
+            originalPosition = transform.position;
+            originalRotation = transform.rotation;
+        }
     }
 
+    /* Immediately stop swinging and reset swing extent */
     void StopSwing()
     {
-        // Start the swing
-        isSwinging = true;
+        // Immediately stop swinging
+        isSwinging = false;
+        // Reset swing extent   
+        swingExtent = 0f;
         umbrellaOpen = true;
         swingStartTime = Time.time;
     }
 
+    /* Perform swing if currently swinging */
     void PerformSwing()
     {
-        float elapsedTime = Time.time - swingStartTime;
-        float totalSwingDuration = swingDuration / currentSwingSpeed;
-
-        if (elapsedTime < totalSwingDuration)
+        if (isSwinging && swingExtent > 0.1f)
         {
-            float swingProgress = elapsedTime / totalSwingDuration;
-            float swingAngle = Mathf.Lerp(90, -60, swingProgress);
+            float swingAngle = Mathf.Lerp(90, -60, swingExtent);
+            Debug.Log("Trigger Depth: " + swingExtent);
 
             if (!isFacingRight)
             {
@@ -264,14 +279,31 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             }
 
             Vector3 direction = new Vector3(Mathf.Cos(swingAngle * Mathf.Deg2Rad), Mathf.Sin(swingAngle * Mathf.Deg2Rad), 0);
-            transform.localPosition = direction * displacement;
+            
+            // Apply the same offset used in HandleUmbrellaOrientation
+            Vector3 offset = new Vector3(0.888f, 0, 0);
+            transform.localPosition = direction * displacement + offset;
+            
             transform.localRotation = Quaternion.Euler(0, 0, swingAngle - 90f);
-            StartCoroutine(TriggerVibration(swingDuration));
+
+            if (swingExtent > 0.5f)
+            {
+                StartCoroutine(TriggerVibration(0.1f));
+            }
         }
         else
         {
+            // Ensure swinging stops if the trigger depth is below the threshold
             isSwinging = false;
-            umbrellaOpen = false;
+        }
+    }
+
+    IEnumerator DebounceStopSwing()
+    {
+        yield return new WaitForSeconds(debounceTime);
+        if (swingExtent <= 0.1f)
+        {
+            isSwinging = false;
         }
     }
 
