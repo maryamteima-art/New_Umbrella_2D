@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public float maxAirSpeed = 5f;
     public bool inWind = false;
     public bool grounded = false;
+    public bool doubleJumper = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
     // Animator
@@ -111,43 +112,35 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         if (!PauseMenu.GamePaused)
         {
             // Apply forces
-            //if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
-
-            if (grounded && !isLaunching)
+            if (grounded && !isLaunching && !doubleJumper)
             {
-                // If on ground and not launching, apply ground force logic
+                // Ground force logic
                 rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
-
-                //Animator
-                robotAnimator.SetBool("Grounded", grounded);
-                robotAnimator.SetFloat("Horizontal", moveInput.x);
-
-
             }
-            else if (!grounded)
+            else
             {
-                // If in air, work with air control (drift slower logic)
+                // Air control logic
                 float airControl = moveInput.x * moveSpeed * airMultiplier;
                 rb.AddForce(Vector2.right * airControl, ForceMode2D.Force);
-                // Calculate and apply aerial velocity
                 Vector2 velocity = rb.velocity;
                 velocity.x = Mathf.Clamp(velocity.x, -maxAirSpeed, maxAirSpeed);
                 rb.velocity = velocity;
-
-                //Animator
-                robotAnimator.SetFloat("Horizontal", moveInput.x);
-                robotAnimator.SetBool("Grounded", grounded);
             }
 
+            // Animator updates
+            robotAnimator.SetBool("Grounded", grounded && !doubleJumper);
+            robotAnimator.SetFloat("Horizontal", moveInput.x);
 
-            // Dampen player on ground (fast stop while running)
-            if (grounded && !isLaunching)
+            // Dampen player on ground
+            if (grounded && !isLaunching && !doubleJumper)
             {
                 Vector2 velocity = rb.velocity;
                 velocity.x *= damping;
                 rb.velocity = velocity;
-
             }
+
+            // Debugging
+            Debug.Log($"Velocity: {rb.velocity.x}, DoubleJumper: {doubleJumper}");
 
             // Update last direction based on move input
             if (moveInput.x > 0)
@@ -190,7 +183,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             }
 
             //VFX: ENABLE & DISABLE TRAIL 
-            if (grounded)
+            if (grounded && !doubleJumper)
             {
                 //Gradually reduce trail width and disable when done
                 if (trailRenderer != null && trailRenderer.widthMultiplier > 0f)
