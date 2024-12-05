@@ -85,6 +85,12 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
 
     void Start()
     {
+        // This should be in elsewhere, but I'm lazy
+        // Show the cursor
+        Cursor.visible = true;
+        // Lock the cursor to the centre of the screen
+        Cursor.lockState = CursorLockMode.Locked;
+
         // Get player and prevent tilting
         rb.freezeRotation = true;
 

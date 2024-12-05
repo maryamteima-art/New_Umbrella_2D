@@ -61,6 +61,11 @@ public class PauseMenu : MonoBehaviour
             InputSystem.PauseHaptics();
             firstPaused = true;
             // EventSystem.current.SetSelectedGameObject(resumeButton);
+
+            // Show the cursor
+            Cursor.visible = true;
+            // Allow cursor to move freely
+            Cursor.lockState = CursorLockMode.Confined;
     }
 
     public void ContinueGame()
@@ -76,6 +81,11 @@ public class PauseMenu : MonoBehaviour
                 
 
             //pausePrompt.SetActive(false);
+
+            // Hide the cursor
+            Cursor.visible = false;
+            // Lock the cursor to the centre of the screen
+            Cursor.lockState = CursorLockMode.Locked;
             }
         firstPaused = false;
 
