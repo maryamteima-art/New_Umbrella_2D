@@ -10,6 +10,13 @@ MonoImporter:
   - soundFX_landWater: {fileID: 8300000, guid: 0b31bc6d48962cd4aad4027253113a7f, type: 3}
   - soundFX_inWind: {fileID: 8300000, guid: 8482c977b852c0e47aba929992fcdfbb, type: 3}
   - soundFX_death: {fileID: 8300000, guid: 28092168c807c4c8f89688d51d4a878c, type: 3}
+  - soundFX_Land: {fileID: 8300000, guid: b1a57f0cb5a7a0049aa78030a2c3dd3e, type: 3}
+  - soundFX_Swing: {fileID: 8300000, guid: a768997388be660488dd693cfc42e370, type: 3}
+  - soundFX_Walk: {fileID: 8300000, guid: 2ebc395dd3fff7441951327259c837d0, type: 3}
+  - soundFX_hitHazard: {fileID: 8300000, guid: 354222bce0d969e4eb7d2fac7bba1fb6, type: 3}
+  - soundFX_checkPoint: {fileID: 8300000, guid: 2da445a5e3fdbca49ac07badfc6c464e, type: 3}
+  - soundFX_bubblePickup: {fileID: 8300000, guid: 5ae03e7beb5ba48818f70860e48067ad, type: 3}
+  - soundFX_bubblePop: {fileID: 8300000, guid: 91c0064b3f1504c608d14a998defc6fe, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
