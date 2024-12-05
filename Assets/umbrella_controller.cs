@@ -355,7 +355,7 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
                 } 
                 else if (isWater && isUmbrellaFacingDown) 
                 {
-                    forceMultiplier = 0.5f;
+                    forceMultiplier = 0.8f;
                 }
                 else 
                 {
