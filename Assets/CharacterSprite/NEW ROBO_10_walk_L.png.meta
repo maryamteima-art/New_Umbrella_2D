@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: aabd9ea0e11ca354c85bc0b631e73434
+guid: d5d463c459f44cf478c963cc9448c7d2
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -107,6 +107,19 @@ TextureImporter:
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
   - serializedVersion: 3
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
     buildTarget: Server
     maxTextureSize: 2048
     resizeAlgorithm: 0
@@ -123,13 +136,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: robot_walk_0
+      name: NEW ROBO_10_walk_L_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -137,20 +150,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 64d352c83a909e648942e40f0bcf11bc
-      internalID: 865534509
+      spriteID: 59eddbb342ede1a478e2da8efa72b265
+      internalID: 430494353
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_walk_1
+      name: NEW ROBO_10_walk_L_1
       rect:
         serializedVersion: 2
-        x: 48
+        x: 72
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -158,41 +171,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3efad967e1b509b4f844d99382d4041c
-      internalID: -1225258518
+      spriteID: cd46107a23b7dc84b8ec7abf84d9ffa2
+      internalID: 1393127265
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_walk_2
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 0
-        width: 48
-        height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ff0199aba08a70c4498d495b8fa72b31
-      internalID: 1571190533
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: robot_walk_3
+      name: NEW ROBO_10_walk_L_2
       rect:
         serializedVersion: 2
         x: 144
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -200,20 +192,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c8c4a32d8758c304ba7582b8e60a428f
-      internalID: 615412829
+      spriteID: c27cb27901550b54985e21e8ee2d6cf5
+      internalID: -1034547873
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_walk_4
+      name: NEW ROBO_10_walk_L_3
       rect:
         serializedVersion: 2
-        x: 192
+        x: 216
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -221,41 +213,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0ef45f4e4cfe2d44c93e06de82651d3e
-      internalID: -566151168
+      spriteID: a66e611f3f8b4d845b5f86b7cca107a6
+      internalID: 621540996
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_walk_5
-      rect:
-        serializedVersion: 2
-        x: 240
-        y: 0
-        width: 48
-        height: 48
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 0eec232ac6424ca4590c27899f4ff9c8
-      internalID: -1242464244
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: robot_walk_6
+      name: NEW ROBO_10_walk_L_4
       rect:
         serializedVersion: 2
         x: 288
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -263,20 +234,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 96e541659e7d02c4f816bbe383a1bb37
-      internalID: 898929183
+      spriteID: 92d81bc1a9208b04d8e30a01fada568f
+      internalID: -1608812583
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: robot_walk_7
+      name: NEW ROBO_10_walk_L_5
       rect:
         serializedVersion: 2
-        x: 336
+        x: 360
         y: 0
-        width: 48
-        height: 48
+        width: 72
+        height: 72
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -284,8 +255,50 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a47900209d09f8b419369008c5e1bedd
-      internalID: -718050390
+      spriteID: 7c1d9a324f36f534ea95e9835e48ee20
+      internalID: -731416244
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NEW ROBO_10_walk_L_6
+      rect:
+        serializedVersion: 2
+        x: 432
+        y: 0
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bee3b6f089291064a93aea6a928a96f9
+      internalID: 1185916148
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: NEW ROBO_10_walk_L_7
+      rect:
+        serializedVersion: 2
+        x: 504
+        y: 0
+        width: 72
+        height: 72
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1a166b0324ff6a945b8075731452d114
+      internalID: -1492160417
       vertices: []
       indices: 
       edges: []
@@ -301,14 +314,14 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      robot_walk_0: 865534509
-      robot_walk_1: -1225258518
-      robot_walk_2: 1571190533
-      robot_walk_3: 615412829
-      robot_walk_4: -566151168
-      robot_walk_5: -1242464244
-      robot_walk_6: 898929183
-      robot_walk_7: -718050390
+      NEW ROBO_10_walk_L_0: 430494353
+      NEW ROBO_10_walk_L_1: 1393127265
+      NEW ROBO_10_walk_L_2: -1034547873
+      NEW ROBO_10_walk_L_3: 621540996
+      NEW ROBO_10_walk_L_4: -1608812583
+      NEW ROBO_10_walk_L_5: -731416244
+      NEW ROBO_10_walk_L_6: 1185916148
+      NEW ROBO_10_walk_L_7: -1492160417
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
