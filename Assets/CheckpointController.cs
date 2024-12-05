@@ -32,10 +32,12 @@ public class CheckpointController : MonoBehaviour
     {
         if (other.CompareTag("Player") && !isPlayerInsideTrigger)
         {
+            if (isPlayerInsideTrigger) return;
+            isPlayerInsideTrigger = true;
             ActivateCheckpoint();
             ShowProgress();
             Debug.Log("I am colliding with flag");
-            isPlayerInsideTrigger = true;
+            
         }
     }
 
@@ -43,8 +45,9 @@ public class CheckpointController : MonoBehaviour
     {
         if (other.CompareTag("Player") && isPlayerInsideTrigger)
         {
-            HideProgress();
+            if (!isPlayerInsideTrigger) return;
             isPlayerInsideTrigger = false;
+            HideProgress();
             Debug.Log("Player left the collision flag");
         }
     }
@@ -56,8 +59,8 @@ public class CheckpointController : MonoBehaviour
         {
             sliderUI.SetActive(true);
             sliderAnimator.enabled = true;
-            sliderAnimator.SetBool("Show", true);
-            sliderAnimator.SetBool("Idle", false);
+            StartCoroutine(WaitForStartAnimation());
+
         }
     }
 
@@ -67,6 +70,8 @@ public class CheckpointController : MonoBehaviour
         {
             
             StartCoroutine(WaitForExitAnimation());
+            sliderAnimator.SetBool("Show", true);
+            sliderAnimator.SetBool("Idle", false);
         }
     }
 
@@ -112,15 +117,39 @@ public class CheckpointController : MonoBehaviour
 
     private IEnumerator WaitForExitAnimation()
     {
+        // Set the Animator to play the "Show" animation
         sliderAnimator.SetBool("Show", false);
         sliderAnimator.SetBool("Idle", true);
         // Wait until the first animation finishes (assuming the first animation duration is known)
+     
         yield return new WaitForSeconds(sliderAnimator.GetCurrentAnimatorStateInfo(0).length);
-        
+        //isPlayerInsideTrigger = false;
 
         sliderUI.SetActive(false);
+       
 
         Debug.Log("I am playing hiding slider");
+    }
+
+    private IEnumerator WaitForStartAnimation()
+    {
+        sliderUI.SetActive(true);
+        //isPlayerInsideTrigger = false;
+        // Set the Animator to play the "Show" animation
+        sliderAnimator.SetBool("Show", true);
+        sliderAnimator.SetBool("Idle", false);
+        // Wait until the first animation finishes (assuming the first animation duration is known)
+        yield return null; // Wait one frame to ensure the transition
+        while (!sliderAnimator.GetCurrentAnimatorStateInfo(0).IsName("Show"))
+        {
+            yield return null; //wait
+        }
+        yield return new WaitForSeconds(sliderAnimator.GetCurrentAnimatorStateInfo(0).length);
+
+
+
+
+        Debug.Log("I am playing show slider");
     }
 
     void ActivateFirework()
