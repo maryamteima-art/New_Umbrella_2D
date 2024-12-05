@@ -70,8 +70,8 @@ public class CheckpointController : MonoBehaviour
         {
             
             StartCoroutine(WaitForExitAnimation());
-            sliderAnimator.SetBool("Show", true);
-            sliderAnimator.SetBool("Idle", false);
+            //sliderAnimator.SetBool("Show", true);
+            //sliderAnimator.SetBool("Idle", false);
         }
     }
 
@@ -122,7 +122,7 @@ public class CheckpointController : MonoBehaviour
         sliderAnimator.SetBool("Idle", true);
         // Wait until the first animation finishes (assuming the first animation duration is known)
      
-        yield return new WaitForSeconds(sliderAnimator.GetCurrentAnimatorStateInfo(0).length);
+        yield return new WaitForSeconds(5);
         //isPlayerInsideTrigger = false;
 
         sliderUI.SetActive(false);
