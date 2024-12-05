@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     public float maxAirSpeed = 5f;
     public bool inWind = false;
     public bool grounded = false;
+    public bool doubleJumper = false;
     private Rigidbody2D rb;
     public bool umbrellaActive = false;
     // Animator
@@ -113,16 +114,14 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             // Apply forces
             //if (!UmbrellaController.umbrellaOpen && !UmbrellaController.umbrellaDown)
 
-            if (grounded && !isLaunching)
+            if (grounded && !isLaunching && !doubleJumper)
             {
                 // If on ground and not launching, apply ground force logic
                 rb.AddForce(Vector2.right * moveInput.x * moveSpeed, ForceMode2D.Force);
 
                 //Animator
-                robotAnimator.SetBool("Grounded", grounded);
+                robotAnimator.SetBool("Grounded", grounded && !doubleJumper);
                 robotAnimator.SetFloat("Horizontal", moveInput.x);
-
-
             }
             else if (!grounded)
             {
