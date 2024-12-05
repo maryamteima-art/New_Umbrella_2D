@@ -6,6 +6,7 @@ using UnityEngine.InputSystem;
 public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaActions
 {
     public Transform player;
+    public Transform anchorPoint;
     public float displacement = 1.0f; 
     public float forceMagnitude = 100f;
     public float slowFallGravityScale = 0.1f;
@@ -67,6 +68,8 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
     private float debounceTime = 0.1f; 
     private Coroutine debounceCoroutine;
 
+    private LineRenderer lineRenderer;
+
     /* Creates new instance of umbrella's controller inputs, registers swing methods, and stores player references */
     void Awake()
     {
@@ -77,6 +80,15 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
         playerRb = player.GetComponent<Rigidbody2D>();
         playerSpriteRenderer = player.GetComponent<SpriteRenderer>();
         playerController = player.GetComponent<PlayerController>();
+
+        // Initialise umbrella arm
+        lineRenderer = gameObject.AddComponent<LineRenderer>();
+        lineRenderer.startWidth = 0.1f;
+        lineRenderer.endWidth = 0.1f;
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startColor = Color.black;
+        lineRenderer.endColor = new Color(0.6f, 0.3f, 0.1f); // Brown colour
+        lineRenderer.sortingOrder = -1;
     }
 
     void OnEnable()
@@ -106,6 +118,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             HandleSwinging();
             previousOrientationInput = orientationInput;
 
+            // Update umbrella arm
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, anchorPoint.position);
         }
     }
 
@@ -125,14 +140,9 @@ public class UmbrellaController : MonoBehaviour, UmbrellaInputActions.IUmbrellaA
             float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
             if (angle < 0) angle += 360f;
 
-            transform.position = player.position + direction * displacement;
-
-            //UMBRELLA OFFSET POSITION
-            transform.position += new Vector3(0.888f, 0, 0);
-
+            transform.position = anchorPoint.position + direction * displacement;
             transform.rotation = Quaternion.Euler(0, 0, angle);
             transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude);
-
 
             //handle scale
             //handle.transform.localScale = Vector3.Lerp(closedSize, openSize, joystickMagnitude) * -1;
