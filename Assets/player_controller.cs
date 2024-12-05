@@ -116,6 +116,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 robotAnimator.SetBool("Grounded", grounded);
                 robotAnimator.SetFloat("Horizontal", moveInput.x);
 
+
             }
             else if (!grounded)
             {
@@ -148,7 +149,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
                 lastDirectionRight = true;
 
                 //Animator
-                robotSpriteRenderer.flipX = false;
+                //robotSpriteRenderer.flipX = false;
 
                 if ((Time.time - lastWalk >= walkCooldown) && (grounded))
                 {
@@ -294,6 +295,7 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
         {
             float forceMagnitude = Mathf.Lerp(100f, 1000f, chargeMeterDecreaseRate);
             rb.AddForce(Vector2.up * forceMagnitude * Time.deltaTime, ForceMode2D.Force);
+
         }
     }
 
@@ -448,14 +450,30 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
             chargeMeterDecreaseRate = Mathf.Lerp(0.2f, 1f, triggerValue);
 
             //FOR VFX: THRUST CHECKER
-            if (HasFuel()) { 
-            VFXManager.Instance.PlayVFX("NewThrust", transform.position + new Vector3(0, -0.5f, 0));
+            if (HasFuel()) 
+            { 
+                VFXManager.Instance.PlayVFX("NewThrust", transform.position + new Vector3(0, -0.5f, 0));
+
+                // Animator
+                robotAnimator.SetBool("Boosting", true);
+                //robotAnimator.SetTrigger("Jetpack");
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
+            }
+            else 
+            {
+                // Animator
+                robotAnimator.SetBool("Boosting", false);
+                robotAnimator.SetFloat("Horizontal", moveInput.x);
             }
         }
         else if (context.phase == InputActionPhase.Canceled)
         {
             // Reset decrease rate when trigger is released
             chargeMeterDecreaseRate = 0f;
+
+            // Animator
+            robotAnimator.SetBool("Boosting", false);
+            robotAnimator.SetFloat("Horizontal", moveInput.x);
         }
     }
 
