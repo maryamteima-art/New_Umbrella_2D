@@ -7,6 +7,8 @@ using UnityEngine.Video;
 public class VideoPlayerController : MonoBehaviour
 {
     [SerializeField] string videoFileName;
+    [SerializeField] string nextSceneName;
+    public Color loadToColor = Color.white;
 
     // Start is called before the first frame update
     void Start()
@@ -24,6 +26,15 @@ public class VideoPlayerController : MonoBehaviour
             Debug.Log(videoPath);
             videoPlayer.url = videoPath;
             videoPlayer.Play();
+            videoPlayer.loopPointReached += OnVideoEnd;
         }
+    }
+
+    private void OnVideoEnd(VideoPlayer vp)
+    {
+        // Load the Main Menu scene after the intro video ends
+        Debug.Log("Scene video ended, loading main menu...");
+        Initiate.Fade(nextSceneName, loadToColor, 0.5f);
+        //SceneManager.LoadScene("MainMenuScene");  // Replace with your main menu scene name
     }
 }

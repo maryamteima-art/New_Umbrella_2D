@@ -12,11 +12,7 @@ public class BGM_Manager : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) 
     {
         Debug.Log("Entered Trigger with: " + other.tag);
-        if (other.CompareTag("MountainArea"))
-        {
-            PlaySound(mountainClip);
-        }
-        else if (other.CompareTag("CaveArea"))
+        if (other.CompareTag("CaveArea"))
         {
             PlaySound(caveClip);
         }

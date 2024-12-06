@@ -28,7 +28,9 @@ public static class Initiate
         scr.fadeColor = col;
         scr.start = true;
         areWeFading = true;
+     
         scr.InitiateFader();
+
         
     }
 
