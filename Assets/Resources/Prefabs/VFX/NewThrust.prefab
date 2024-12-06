@@ -8,6 +8,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2729287849661125705, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2729287849661125705, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
+      propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6278717474222045219, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 6278717474222045219, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
       value: 1
@@ -54,7 +66,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6278717474222045219, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
-      value: 15
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 7160566582682753032, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: m_LocalPosition.x
@@ -98,7 +110,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8718255712970408550, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: m_Name
-      value: NewThrust Variant
+      value: NewThrust
+      objectReference: {fileID: 0}
+    - target: {fileID: 9077408436766342661, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
+      propertyPath: InitialModule.maxNumParticles
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9077408436766342661, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: InitialModule.startColor.maxColor.b
@@ -142,7 +158,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9077408436766342661, guid: beacd0edd4af0d44181e0b72ab695000, type: 3}
       propertyPath: EmissionModule.m_Bursts.Array.data[0].countCurve.scalar
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
