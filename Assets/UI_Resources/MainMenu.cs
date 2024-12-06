@@ -27,7 +27,7 @@ public class MainMenu : MonoBehaviour
     }
 
     // Method to detect joystick button press
-    bool AnyAnalogButtonPressed()
+     bool AnyAnalogButtonPressed()
     {
         for (int i = 0; i < 20; i++) // https://discussions.unity.com/t/find-out-if-any-button-on-any-gamepad-has-been-pressed-and-which-one/65089
         {

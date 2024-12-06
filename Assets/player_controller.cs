@@ -517,6 +517,8 @@ public class PlayerController : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
         return chargeMeter.transform.localScale.y > 0;
     }
+    //Triggering Rumble feedback 
+    //https://docs.unity3d.com/Packages/com.unity.inputsystem@0.9/manual/Gamepad.html
 
     private IEnumerator TriggerVibration(float time)
     {

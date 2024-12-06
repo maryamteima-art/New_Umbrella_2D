@@ -33,14 +33,14 @@ public class BGM_Manager : MonoBehaviour
     {
         float volume = audioSource.volume;
 
-        // Fade out current sound
+        //Fade out current sound
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)
         {
             audioSource.volume = Mathf.Lerp(volume, 0, t / fadeDuration);
             yield return null;
         }
 
-        // Switch clip and fade in
+        //Switch clip and fade in
         audioSource.clip = newClip;
         audioSource.Play();
         for (float t = 0; t < fadeDuration; t += Time.deltaTime)

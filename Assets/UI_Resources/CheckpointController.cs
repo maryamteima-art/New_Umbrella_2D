@@ -19,7 +19,6 @@ public class CheckpointController : MonoBehaviour
 
     private bool isPlayerInsideTrigger = false;
 
-
     void Start()
     {
         spawnPosition = transform.position;
@@ -60,7 +59,6 @@ public class CheckpointController : MonoBehaviour
             sliderUI.SetActive(true);
             sliderAnimator.enabled = true;
             StartCoroutine(WaitForStartAnimation());
-
         }
     }
 
@@ -82,7 +80,7 @@ public class CheckpointController : MonoBehaviour
     {
         if (!isActivated)
         {
-            //if it is not the first tiem active so it only runs once
+            //if it is not the first time active so it only runs once
             isActivated = true;
             isFirstTimeActive =true;
             //flagAnimator.enabled = true; // Enable the Animator
@@ -90,8 +88,6 @@ public class CheckpointController : MonoBehaviour
             {
                 flagAnimator.SetBool("firstActive", true);
                 SoundFXManager.instance.PlayCheckpointClip(transform, 0.5f);
-
-                // Set the parameter to trigger the first animation
 
                 //isFirstTimeActive = false;
                 Debug.Log("I am playing animations");
@@ -106,7 +102,7 @@ public class CheckpointController : MonoBehaviour
     }
     private IEnumerator PlayIdleActiveAnimation()
     {
-        // Wait until the first animation finishes (assuming the first animation duration is known)
+        // Wait till animation (first) finishes
         yield return new WaitForSeconds(flagAnimator.GetCurrentAnimatorStateInfo(0).length);
 
         // Set the flag's animation to idle/active state
@@ -120,7 +116,6 @@ public class CheckpointController : MonoBehaviour
         // Set the Animator to play the "Show" animation
         sliderAnimator.SetBool("Show", false);
         sliderAnimator.SetBool("Idle", true);
-        // Wait until the first animation finishes (assuming the first animation duration is known)
      
         yield return new WaitForSeconds(5);
         //isPlayerInsideTrigger = false;
@@ -138,16 +133,14 @@ public class CheckpointController : MonoBehaviour
         // Set the Animator to play the "Show" animation
         sliderAnimator.SetBool("Show", true);
         sliderAnimator.SetBool("Idle", false);
-        // Wait until the first animation finishes (assuming the first animation duration is known)
-        yield return null; // Wait one frame to ensure the transition
+
+        //Wait until the first animation finishes
+        yield return null; //Wait one frame 
         while (!sliderAnimator.GetCurrentAnimatorStateInfo(0).IsName("Show"))
         {
             yield return null; //wait
         }
         yield return new WaitForSeconds(sliderAnimator.GetCurrentAnimatorStateInfo(0).length);
-
-
-
 
         Debug.Log("I am playing show slider");
     }
@@ -155,24 +148,24 @@ public class CheckpointController : MonoBehaviour
     void ActivateFirework()
     {
 
-        // Instantiate the particle system at the spawn location
+        //Instantiate the fireworks at the spawn location
         GameObject particleInstance = Instantiate(
             fireworkVFX,
             transform.position,
             Quaternion.identity
         );
 
-        //parent the particle system to this object
+        //parent the fireworks system to this object
         particleInstance.transform.SetParent(transform);
 
-        // Play the particle system
+        //Play the fireworks system
         ParticleSystem ps = particleInstance.GetComponent<ParticleSystem>();
         if (ps != null)
         {
             ps.Play();
         }
 
-        // Destroy the particle system after it finishes
+        //Destroy the fireworks after done
         Destroy(particleInstance, 10);
 
 
